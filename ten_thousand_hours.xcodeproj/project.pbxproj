@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		954D4E222B06B06100446756 /* ten_thousand_hoursApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954D4E212B06B06100446756 /* ten_thousand_hoursApp.swift */; };
-		954D4E242B06B06100446756 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954D4E232B06B06100446756 /* ContentView.swift */; };
+		954D4E242B06B06100446756 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954D4E232B06B06100446756 /* StatusBarView.swift */; };
 		954D4E262B06B06300446756 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 954D4E252B06B06300446756 /* Assets.xcassets */; };
 		954D4E292B06B06300446756 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 954D4E282B06B06300446756 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
@@ -16,7 +16,7 @@
 /* Begin PBXFileReference section */
 		954D4E1E2B06B06100446756 /* ten_thousand_hours.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ten_thousand_hours.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		954D4E212B06B06100446756 /* ten_thousand_hoursApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ten_thousand_hoursApp.swift; sourceTree = "<group>"; };
-		954D4E232B06B06100446756 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		954D4E232B06B06100446756 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		954D4E252B06B06300446756 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		954D4E282B06B06300446756 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,7 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				954D4E212B06B06100446756 /* ten_thousand_hoursApp.swift */,
-				954D4E232B06B06100446756 /* ContentView.swift */,
+				954D4E232B06B06100446756 /* StatusBarView.swift */,
 				954D4E252B06B06300446756 /* Assets.xcassets */,
 				954D4E272B06B06300446756 /* Preview Content */,
 			);
@@ -137,7 +137,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				954D4E242B06B06100446756 /* ContentView.swift in Sources */,
+				954D4E242B06B06100446756 /* StatusBarView.swift in Sources */,
 				954D4E222B06B06100446756 /* ten_thousand_hoursApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
