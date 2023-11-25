@@ -36,7 +36,7 @@ struct ContentView: View {
                         .background(Color("LightPurple"))
                         .cornerRadius(100)
                         .padding(.leading, 18)
-                        .padding(.trailing, 12)
+                        .padding(.trailing, 11)
                     
                     VStack(alignment: .leading) {
                         Text("Ivy")
