@@ -25,7 +25,7 @@ struct ContentView: View {
                     
                     Rectangle()
                         .foregroundColor(.clear)
-                        .frame(width: 36, height: 36)
+                        .frame(width: 50, height: 50)
                         .background(
                             Image("ProfilePic")
                                 .resizable()
@@ -40,8 +40,8 @@ struct ContentView: View {
                     
                     VStack(alignment: .leading) {
                         Text("Ivy")
-                            .font(Font.custom("DM Sans", size: 14).weight(.bold))
-                            .frame(width: 163, alignment: .leading) // Align text to the left
+                            .font(Font.custom("DM Sans", size: 18).weight(.bold))
+                            .frame(alignment: .leading) // Align text to the left
                         
                         Text("Beginner")
                             .font(Font.custom("DM Sans", size: 10))
