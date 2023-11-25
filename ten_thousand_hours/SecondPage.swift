@@ -1,28 +1,27 @@
-//
-//  SecondPage.swift
-//  ten_thousand_hours
-//
-//  Created by 余懿炜 on 11/24/23.
-//
-
 import SwiftUI
+
+// Define custom colors to match the design
+extension Color {
+    static let backgroundGray = Color(red: 240 / 255, green: 240 / 255, blue: 240 / 255)
+    static let progressGray = Color(red: 229 / 255, green: 229 / 255, blue: 234 / 255)
+    static let textGray = Color(red: 142 / 255, green: 142 / 255, blue: 147 / 255)
+}
 
 struct Bside: View {
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading) {
-                    GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
-                    ProgressGridView(items: [
-                        ProgressItem(title: "Python", color: .green, progress: 0.6),
-                        ProgressItem(title: "Java", color: .blue, progress: 0.6),
-                        ProgressItem(title: "Security", color: .blue, progress: 0.6, hours: 15),
-                        ProgressItem(title: "CPU", color: .green, progress: 0.6),
-                        ProgressItem(title: "OS", color: .orange, progress: 0.6),
-                        ProgressItem(title: "Frontend", color: .blue, progress: 0.6)
-                    ])
-                }
-                .navigationBarTitle("Progress Tracker", displayMode: .inline)
+        ZStack {
+            Color.backgroundGray.edgesIgnoringSafeArea(.all)
+            VStack {
+                GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
+                ProgressGridView(items: [
+                    ProgressItem(title: "Python", color: .green, progress: 0.6, icon: "laptopcomputer"),
+                    ProgressItem(title: "Java", color: .blue, progress: 0.6, icon: "laptopcomputer"),
+                    ProgressItem(title: "Security", color: .blue, progress: 0.3, hours: 15, icon: "lock.shield"),
+                    ProgressItem(title: "CPU", color: .green, progress: 0.6, icon: "cpu"),
+                    ProgressItem(title: "OS", color: .orange, progress: 0.6, icon: "desktopcomputer"),
+                    ProgressItem(title: "Frontend", color: .blue, progress: 0.6, icon: "paintbrush.pointed")
+                ])
+                Spacer()
             }
         }
     }
@@ -34,32 +33,100 @@ struct GoalProgressView: View {
     var goalText: String
     
     var body: some View {
-        VStack {
-            Text(title)
-                .font(.headline)
-            ProgressView(value: progress)
-            Text(goalText)
-            Button("Continue") {
-                // Actions to continue
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("💻") // Laptop emoji
+                    .font(.system(size: 30))
+                    .padding(6)
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(radius: 1)
+                
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.black)
+                
+                Spacer()
+                
+                Image("check-circle--check") // Your custom checkmark image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
             }
-            .buttonStyle(.borderedProminent)
+            
+            ZStack {
+                GeometryReader { geometry in
+                    RoundedRectangle(cornerRadius: 45)
+                        .frame(height: 10)
+                        .foregroundColor(Color.progressGray)
+                    RoundedRectangle(cornerRadius: 45)
+                        .frame(width: geometry.size.width * CGFloat(progress), height: 10)
+                        .foregroundColor(Color.blue)
+                        .animation(.easeInOut, value: progress)
+                }
+            }
+            .frame(height: 10)
+            
+            // Horizontal dotted line using custom color from assets
+            Rectangle()
+                .fill(Color.clear)
+                .frame(height: 1)
+                .overlay(
+                    Rectangle()
+                        .stroke(style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
+                        .foregroundColor(Color("mygray")) // Custom color from asset catalog
+                )
+                .padding(.vertical)
+            
+            HStack {
+                Image(systemName: "books.vertical")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color.textGray)
+                
+                Text(goalText)
+                    .font(.footnote)
+                    .foregroundColor(Color.textGray)
+                
+                Spacer()
+                
+                Button(action: {
+                    // Actions to continue
+                }) {
+                    Text("Continue")
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                }
+                .shadow(radius: 1)
+            }
         }
         .padding()
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.white)) // Background color for the box
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1)) // Border color and width for the box
-        .padding([.horizontal, .top])
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 1)
+        .scaleEffect(0.8)
     }
 }
+
+
+
+
+
 
 struct ProgressGridView: View {
     var items: [ProgressItem]
     
     var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
             ForEach(items, id: \.title) { item in
                 ProgressCell(item: item)
             }
         }
+        .padding()
     }
 }
 
@@ -68,6 +135,7 @@ struct ProgressItem {
     var color: Color
     var progress: Float
     var hours: Int? = nil
+    var icon: String
 }
 
 struct ProgressCell: View {
@@ -75,17 +143,38 @@ struct ProgressCell: View {
     
     var body: some View {
         VStack {
+            ZStack {
+                Circle()
+                    .stroke(Color.progressGray, lineWidth: 6)
+                    .frame(width: 70, height: 70)
+                
+                Circle()
+                    .trim(from: 0.0, to: CGFloat(min(self.item.progress, 1.0)))
+                    .stroke(item.color, lineWidth: 6)
+                    .frame(width: 70, height: 70)
+                    .rotationEffect(Angle(degrees: 270.0))
+                
+                Image(systemName: item.icon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 30, height: 30)
+            }
+            
             Text(item.title)
                 .font(.headline)
-            if let hours = item.hours {
-                Text("\(hours)h")
+                .foregroundColor(.black)
+                .padding(.top, 8)
+            
+            if item.hours != nil {
+                Text("\(item.hours!)h")
                     .font(.caption)
-            } else {
-                ProgressView(value: item.progress)
-                    .tint(item.color)
+                    .foregroundColor(Color.textGray)
             }
         }
         .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 1)
     }
 }
 
@@ -94,3 +183,4 @@ struct Bside_Previews: PreviewProvider {
         Bside()
     }
 }
+
