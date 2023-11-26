@@ -18,37 +18,41 @@ struct Constants {
 // MARK: - ContentView
 struct ContentView: View {
     var body: some View {
-        VStack {
-            ScrollView {
-                VStack {
-                    HStack(alignment: .center, spacing: 10) {
-                        // Profile picture and name setup
-                        ProfilePhoto()
-                        
-                        // User name and Tag
-                        NameAndTag()
+        NavigationView {
+            VStack {
+                ScrollView {
+                    VStack {
+                        HStack(alignment: .center, spacing: 10) {
+                            // Profile picture and name setup
+                            ProfilePhoto()
+                            
+                            // User name and Tag
+                            NameAndTag()
+                            
+                            Spacer()
+                            
+                            // Search button with white/green circle background
+                            ProfileButtons()
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.top, 12)
+                        .cornerRadius(100)
                         
                         Spacer()
                         
-                        // Search button with white/green circle background
-                        ProfileButtons()
+                        // Your other content here
+                        Categories()
+                        
+                        TasksView()
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.top, 12)
-                    .cornerRadius(100)
-                    
-                    Spacer()
-                    
-                    // Your other content here
-                    Categories()
                 }
+                .background(Color("HomeBackground"))
+                
+                Spacer() // This will push all content to the top, but we're removing it to keep the bar fixed at bottom
+                
+                // Bottom Navigation Bar
+                BottomNavigationBar()
             }
-            .background(Color("HomeBackground"))
-            
-            Spacer() // This will push all content to the top, but we're removing it to keep the bar fixed at bottom
-            
-            // Bottom Navigation Bar
-            BottomNavigationBar()
         }
     }
 }
@@ -170,7 +174,7 @@ struct Categories: View {
             HStack {
                 CircleButtonView(emoji: "⚽️", label: "Sport")
                 CircleButtonView(emoji: "🎨", label: "Design")
-                CircleButtonView(emoji: "💻", label: "Tech")
+                CircleButtonView(emoji: "💻", label: "Tech", destination: AnyView(Bside()))
                 CircleButtonView(emoji: "🍪", label: "Cook")
             }
             HStack {
@@ -186,28 +190,38 @@ struct Categories: View {
 struct CircleButtonView: View {
     var emoji: String
     var label: String
+    var destination: AnyView? // Optional destination view
     
     var body: some View {
         VStack {
-            Button(action: {
-                // Action to navigate to another page
-            }) {
-                Text(emoji)
-                    .font(
-                    Font.custom("DM Sans", size: 20)
-                    .weight(.bold)
-                    )
-                    .frame(width: 50, height: 50)
-                    .background(Circle().fill(Color.white))
-                    .shadow(color: Color("mygray"), radius: 1)
+            if let destinationView = destination {
+                // If there is a destination, make the button a NavigationLink
+                NavigationLink(destination: destinationView) {
+                    CircleButtonContent(emoji: emoji, label: label)
+                }
+            } else {
+                // If there isn't a destination, just create a button without navigation
+                Button(action: {
+                    // Action to navigate to another page
+                }) {
+                    CircleButtonContent(emoji: emoji, label: label)
+                }
             }
-            .padding(.horizontal, 15)
-            .padding(.bottom, 7)
+        }
+    }
+    
+    private func CircleButtonContent(emoji: String, label: String) -> some View {
+        VStack {
+            Text(emoji)
+                .font(Font.custom("DM Sans", size: 20).weight(.bold))
+                .frame(width: 50, height: 50)
+                .background(Circle().fill(Color.white))
+                .shadow(color: Color("mygray"), radius: 1)
+                .padding(.horizontal, 15)
+                            .padding(.bottom, 7)
             Text(label)
-                .font(
-                Font.custom("DM Sans", size: 12)
-                .weight(.medium)
-                )
+                .font(Font.custom("DM Sans", size: 12).weight(.medium))
+                .foregroundColor(.black)
         }
         .padding(.vertical, 8)
     }
@@ -241,6 +255,93 @@ struct BottomNavigationBar: View {
         .padding(.vertical, 10)
         .background(.white)
         .frame(height: 60)
+    }
+}
+
+// MARK: - Tasks
+// Define a data model for the task
+struct Task {
+    var name: String
+    var progress: CGFloat
+    var goalHours: Int
+}
+
+// Define the card view for each task
+struct TaskCardView: View {
+    var task: Task
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(task.name)
+                .font(.headline)
+            
+            ProgressView(value: task.progress, total: 100)
+                .progressViewStyle(LinearProgressViewStyle())
+            
+            HStack {
+                Spacer()
+                Button("Continue") {
+                    // Action to continue task
+                }
+                .buttonStyle(.bordered)
+                Spacer()
+            }
+            
+            Text("Goal: \(task.goalHours)h")
+                .font(.caption)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 5)
+    }
+}
+
+// Define the horizontal scroll view
+struct TaskScrollView: View {
+    var tasks: [Task]
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("Tasks In Progress")
+                    .font(.title2)
+                    .fontWeight(.bold)
+
+                Spacer()
+
+                Button(action: {
+                    // Action for View All
+                }) {
+                    Text("View All")
+                }
+            }
+            .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 20) {
+                    ForEach(tasks, id: \.name) { task in
+                        TaskCardView(task: task)
+                            .frame(width: 200)
+                    }
+                }
+                .padding()
+            }
+        }
+    }
+}
+
+
+// Example usage
+struct TasksView: View {
+    var tasks = [
+        Task(name: "Web Design", progress: 44, goalHours: 100),
+        Task(name: "Figma", progress: 15, goalHours: 50),
+        // Add more tasks here
+    ]
+    
+    var body: some View {
+        TaskScrollView(tasks: tasks)
     }
 }
 
