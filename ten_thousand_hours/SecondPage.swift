@@ -36,22 +36,27 @@ struct GoalProgressView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("💻") // Laptop emoji
-                    .font(.system(size: 30))
+                    .font(.system(size: 33))
                     .padding(6)
                     .background(Color.white)
                     .clipShape(Circle())
                     .shadow(radius: 1)
                 
                 Text(title)
-                    .font(.headline)
-                    .foregroundColor(.black)
-                
-                Spacer()
+                    .font(.system(size: UIFont.preferredFont(forTextStyle: .headline).pointSize * 1.5)) // 1.1 times the current size
+                                    .foregroundColor(.black)
+                                
+                                Spacer()
                 
                 Image("check-circle--check") // Your custom checkmark image
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
+                
+                // Percentage display added here, on the right side
+                Text("\(Int(progress * 100))%") // Converts the progress to a percentage
+                    .font(.system(size: 30 * 1.05, weight: .bold)) // 20% larger and bold font
+                    .foregroundColor(Color.blue) // Use the color of the progress bar
             }
             
             ZStack {
@@ -67,7 +72,6 @@ struct GoalProgressView: View {
             }
             .frame(height: 10)
             
-            // Horizontal dotted line using custom color from assets
             Rectangle()
                 .fill(Color.clear)
                 .frame(height: 1)
@@ -116,7 +120,6 @@ struct GoalProgressView: View {
 
 
 
-
 struct ProgressGridView: View {
     var items: [ProgressItem]
     
@@ -140,33 +143,57 @@ struct ProgressItem {
 
 struct ProgressCell: View {
     var item: ProgressItem
-    
+
     var body: some View {
         VStack {
+            // Icon and Text at the top
+            HStack {
+                Text("💻") // Icon on the left
+                    .font(.headline)
+                    .padding(6)
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(radius: 1)
+
+                Spacer()
+
+                Text(item.title) // Text on the right
+                    .font(.headline)
+                    .foregroundColor(.black)
+            }
+            .padding(.bottom, 5)
+
+            // Dotted line
+            Rectangle()
+                .fill(Color.clear)
+                .frame(height: 1)
+                .overlay(
+                    Rectangle()
+                        .stroke(style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
+                        .foregroundColor(Color("mygray")) // Custom color from asset catalog
+                )
+
+            // Progress ring with percentage in the middle
             ZStack {
                 Circle()
                     .stroke(Color.progressGray, lineWidth: 6)
                     .frame(width: 70, height: 70)
-                
+
                 Circle()
                     .trim(from: 0.0, to: CGFloat(min(self.item.progress, 1.0)))
                     .stroke(item.color, lineWidth: 6)
                     .frame(width: 70, height: 70)
                     .rotationEffect(Angle(degrees: 270.0))
-                
-                Image(systemName: item.icon)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
+
+                Text("\(Int(item.progress * 100))%") // Percentage
+                    .font(.caption)
+                    .foregroundColor(.black)
             }
-            
-            Text(item.title)
-                .font(.headline)
-                .foregroundColor(.black)
-                .padding(.top, 8)
-            
-            if item.hours != nil {
-                Text("\(item.hours!)h")
+            .padding(.top, 5)
+
+            // Hours (if available)
+            if let hours = item.hours {
+                Text("\(hours)h")
                     .font(.caption)
                     .foregroundColor(Color.textGray)
             }
@@ -183,4 +210,3 @@ struct Bside_Previews: PreviewProvider {
         Bside()
     }
 }
-
