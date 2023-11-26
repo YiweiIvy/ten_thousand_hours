@@ -37,8 +37,10 @@ struct ContentView: View {
                     .padding(.top, 12)
                     .cornerRadius(100)
                     
-                    // Your other content here
+                    Spacer()
                     
+                    // Your other content here
+                    Categories()
                 }
             }
             .background(Color("HomeBackground"))
@@ -160,6 +162,57 @@ struct ProfileButtons: View {
         }
     }
 }
+
+// MARK: - Categories
+struct Categories: View {
+    var body: some View {
+        VStack {
+            HStack {
+                CircleButtonView(emoji: "⚽️", label: "Sport")
+                CircleButtonView(emoji: "🎨", label: "Design")
+                CircleButtonView(emoji: "💻", label: "Tech")
+                CircleButtonView(emoji: "🍪", label: "Cook")
+            }
+            HStack {
+                CircleButtonView(emoji: "🕺", label: "Dance")
+                CircleButtonView(emoji: "🥁", label: "Music")
+                CircleButtonView(emoji: "➕", label: "Add")
+            }
+        }
+        .padding(.top, 20)
+    }
+}
+
+struct CircleButtonView: View {
+    var emoji: String
+    var label: String
+    
+    var body: some View {
+        VStack {
+            Button(action: {
+                // Action to navigate to another page
+            }) {
+                Text(emoji)
+                    .font(
+                    Font.custom("DM Sans", size: 20)
+                    .weight(.bold)
+                    )
+                    .frame(width: 50, height: 50)
+                    .background(Circle().fill(Color.white))
+                    .shadow(color: Color("mygray"), radius: 1)
+            }
+            .padding(.horizontal, 15)
+            .padding(.bottom, 7)
+            Text(label)
+                .font(
+                Font.custom("DM Sans", size: 12)
+                .weight(.medium)
+                )
+        }
+        .padding(.vertical, 8)
+    }
+}
+
 
 // MARK: - BottomNavigationBar
 struct BottomNavigationBar: View {

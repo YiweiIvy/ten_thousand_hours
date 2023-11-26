@@ -1,0 +1,10 @@
+# Xcode
+##
+# Xcode temporary files that should never be committed
+*.xcuserstate
+project.xcworkspace
+xcuserdata/
+DerivedData/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
