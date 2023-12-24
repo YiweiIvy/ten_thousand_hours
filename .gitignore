@@ -8,3 +8,4 @@ DerivedData/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+*.DS_Store
