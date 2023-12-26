@@ -234,8 +234,24 @@ struct CircleButtonView: View {
 // Define the horizontal scroll view
 struct TaskScrollView: View {
     
+    // Two-dimensional array to hold tasks in pairs
+    private var taskPairs: [[Task]] {
+        var pairs: [[Task]] = []
+        for index in stride(from: 0, to: Task.allTasks.count, by: 2) {
+            var pair: [Task] = []
+            if index < Task.allTasks.count {
+                pair.append(Task.allTasks[index])
+            }
+            if index + 1 < Task.allTasks.count {
+                pair.append(Task.allTasks[index + 1])
+            }
+            pairs.append(pair)
+        }
+        return pairs
+    }
+    
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) { // Set spacing to 0 or another small value
             HStack {
                 Text("Tasks In Progress")
                     .font(.title2)
@@ -246,16 +262,30 @@ struct TaskScrollView: View {
                 Button(action: {
                     // Action for View All
                 }) {
-                    Text("View All")
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundColor(Color("MyGreen"))
+                            .frame(minWidth: 42, minHeight: 25)
+                        Text("View all")
+                            .font(.caption)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                    }
+                    .fixedSize()
                 }
             }
-            .padding(.horizontal)
-
+            .padding([.horizontal, .top])
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 20) {
-                    GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
-                    GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
-                    GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
+                    ForEach(taskPairs, id: \.self) { pair in // Loop through task pairs
+                        VStack {
+                            ForEach(pair, id: \.id) { task in
+                                ProgressView(task: task)
+                                    .frame(width: 300, height: 180) // Set a larger frame for each card
+                            }
+                        }
+                    }
                 }
                 .padding()
             }
@@ -263,13 +293,115 @@ struct TaskScrollView: View {
     }
 }
 
-
 // Example usage
 struct TasksView: View {
     
     var body: some View {
         TaskScrollView()
     }
+}
+
+struct ProgressView: View {
+    let task: Task // Your Task model
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(task.iconName) // Replace with your icon name
+                    .font(.system(size: 33))
+                    .padding(6)
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(radius: 1)
+                
+                Text(task.title)
+                    .font(.headline)
+                    .foregroundColor(.black)
+                
+                Spacer()
+                
+                ZStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .foregroundColor(Color(task.color))
+                        .frame(minWidth: 42, minHeight: 21) // Minimum size to accommodate the text and padding
+                    Text("\(Int(task.progress * 100))%")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                }
+                .fixedSize()
+            }
+            
+            ZStack {
+                GeometryReader { geometry in
+                    RoundedRectangle(cornerRadius: 45)
+                        .frame(height: 10)
+                        .foregroundColor(Color.gray.opacity(0.2))
+                    RoundedRectangle(cornerRadius: 45)
+                        .frame(width: geometry.size.width * CGFloat(task.progress), height: 10)
+                        .foregroundColor(Color(task.color))
+                        .animation(.easeInOut, value: task.progress)
+                }
+            }
+            .frame(height: 10)
+            
+            Divider()
+                .background(Color.gray.opacity(0.5)) // Custom color from asset catalog
+                
+            HStack {
+                Text(task.goalText)
+                    .font(.footnote)
+                    .foregroundColor(Color.gray)
+                
+                Spacer()
+                
+                Button(action: {
+                    // Actions to continue
+                }) {
+                    Text("Continue")
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Color("DarkPurple"))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                }
+                .shadow(radius: 1)
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 1)
+        .scaleEffect(0.95) // Adjust the scale to match the size from the image
+    }
+}
+
+struct Task: Identifiable, Hashable { // Conform to Hashable
+    let id: UUID = UUID()
+    let title: String
+    let iconName: String
+    let progress: Float
+    let goalText: String
+    let color: String
+    
+    // Provide a hash function for Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    // Make sure to also provide an equality operator for Hashable conformance
+    static func == (lhs: Task, rhs: Task) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    // Sample data
+    static let allTasks = [
+        Task(title: "Web Design", iconName: "🎨", progress: 0.44, goalText: "Goal: 100h", color:"MyOrange"),
+        Task(title: "Python", iconName: "💻", progress: 0.80, goalText: "Goal: 50h", color:"MyBlue"),
+        Task(title: "Python", iconName: "💻", progress: 0.25, goalText: "Goal: 50h", color:"MyBlue"),
+        Task(title: "Python", iconName: "🎨", progress: 0.50, goalText: "Goal: 50h", color:"MyGreen"),
+        // Add more tasks here...
+    ]
 }
 
 // MARK: - BottomNavigationBar
