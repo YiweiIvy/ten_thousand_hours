@@ -15,8 +15,8 @@ struct Constants {
     static let inactiveTabColor: Color = .gray
 }
 
-// MARK: - ContentView
-struct ContentView: View {
+// MARK: - HomePageView
+struct HomePageView: View {
     var body: some View {
         NavigationView {
             VStack {
@@ -183,21 +183,24 @@ struct ProfileButtons: View {
 
 // MARK: - Categories
 struct Categories: View {
+    @StateObject var loginViewModel = LoginViewModel()
+    let categories: [Category] = Category.defaultCategories()
+    
+    private var gridLayout: [GridItem] {
+        Array(repeating: .init(.flexible()), count: 4)
+    }
+    
     var body: some View {
-        VStack {
-            HStack {
-                CircleButtonView(emoji: "⚽️", label: "Sport")
-                CircleButtonView(emoji: "🎨", label: "Design")
-                CircleButtonView(emoji: "💻", label: "Tech", destination: AnyView(Bside()))
-                CircleButtonView(emoji: "🍪", label: "Cook")
+        ScrollView {
+            LazyVGrid(columns: gridLayout, spacing: 20) {
+                ForEach(categories, id: \.name) { category in
+                    CircleButtonView(emoji: category.emoji, label: category.name, destination: category.destination)
+                }
+                CircleButtonView(emoji: "➕", label: "Add", destination: AnyView(AddCategoryView()))
             }
-            HStack {
-                CircleButtonView(emoji: "🕺", label: "Dance")
-                CircleButtonView(emoji: "🥁", label: "Music")
-                CircleButtonView(emoji: "➕", label: "Add")
-            }
+            .padding(.top, 20)
+            .padding(.horizontal, 25)
         }
-        .padding(.top, 20)
     }
 }
 
@@ -448,6 +451,7 @@ struct BottomNavigationBar: View {
 // MARK: - Previews
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        HomePageView()
+            .environmentObject(UserSession()) 
     }
 }

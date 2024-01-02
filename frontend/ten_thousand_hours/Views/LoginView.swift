@@ -12,7 +12,8 @@ struct LoginView: View {
     @Binding var username: String
     @Binding var level: String
     @Environment(\.dismiss) var dismiss
-    @State private var showingSignup = true
+    @State private var showingSignup = false
+    @EnvironmentObject var userSession: UserSession
     
     var body: some View {
         NavigationStack {
@@ -28,6 +29,7 @@ struct LoginView: View {
                 SignupView() // Define this view
             }
             .onAppear {
+                viewModel.userSession = userSession
                 viewModel.onDismiss = {
                     username = viewModel.username
                     level = viewModel.level

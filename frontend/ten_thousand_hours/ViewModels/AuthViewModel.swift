@@ -15,14 +15,18 @@ class LoginViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var isLoggingIn: Bool = false
     var onDismiss: (() -> Void)?
+    var userSession: UserSession?
     
     func login() async {
         isLoggingIn = true
-        defer { isLoggingIn = false } // This ensures that isLoggingIn is set to false when the function exits
+        defer { isLoggingIn = false }
+        
         do {
-            let user = try await realmApp.login(credentials: .emailPassword(email: email, password: password))
-            await fetchAndSetUsername(userId: user.id)
-            DispatchQueue.main.async { // Switch to the main thread to update the UI
+            let realmUser = try await realmApp.login(credentials: .emailPassword(email: email, password: password))
+            let appUser = User(id: realmUser.id, email: email, username: username, level: level, categories: [])
+            await fetchAndSetUsername(userId: realmUser.id)
+            DispatchQueue.main.async {
+                self.userSession?.currentUser = appUser
                 self.onDismiss?()
             }
         } catch {
@@ -98,7 +102,8 @@ class SignupViewModel: ObservableObject {
         
         let updateData: [String: AnyBSON] = [
             "username": .string(username),
-            "level": .string(level)
+            "level": .string(level),
+            "categories": .array([])
         ]
         
         collection.updateOneDocument(
