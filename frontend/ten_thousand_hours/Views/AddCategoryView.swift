@@ -11,9 +11,9 @@ struct AddCategoryView: View {
     @State private var emoji: String = ""
     @State private var name: String = ""
     @State private var targetTime: TimeInterval = 100000
-    @StateObject var viewModel = CategoryViewModel()
     @FocusState private var isInputActive: Bool
     @EnvironmentObject var userSession: UserSession
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         VStack {
@@ -33,19 +33,21 @@ struct AddCategoryView: View {
                 if let currentUser = userSession.currentUser {
                     // Your view code that requires currentUser
                     print(currentUser)
+                    let viewModel = CategoryViewModel()
                     Task {
                         do {
                             let newCategory = Category(
                                 id: UUID().uuidString,
                                 emoji: emoji,
                                 name: name,
-                                destination: AnyView(Text(name)),
-                                targetTime: targetTime
+                                targetTime: targetTime,
+                                goalCards: []
                             )
                             try await viewModel.addCategory(newCategory, to: currentUser)
-                        } catch {
-                            // Handle the error appropriately
-                            print("Error adding category: \(error)")
+                            // Dismiss the view after adding the category
+                            DispatchQueue.main.async {
+                                self.presentationMode.wrappedValue.dismiss()
+                            }
                         }
                     }
                     
