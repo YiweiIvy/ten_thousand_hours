@@ -15,14 +15,18 @@ class LoginViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var isLoggingIn: Bool = false
     var onDismiss: (() -> Void)?
+    var userSession: UserSession?
     
     func login() async {
         isLoggingIn = true
-        defer { isLoggingIn = false } // This ensures that isLoggingIn is set to false when the function exits
+        defer { isLoggingIn = false }
+        
         do {
-            let user = try await realmApp.login(credentials: .emailPassword(email: email, password: password))
-            await fetchAndSetUsername(userId: user.id)
-            DispatchQueue.main.async { // Switch to the main thread to update the UI
+            let realmUser = try await realmApp.login(credentials: .emailPassword(email: email, password: password))
+            let appUser = User(id: realmUser.id, email: email, username: username, level: level, categories: [])
+            await fetchAndSetUsername(userId: realmUser.id)
+            DispatchQueue.main.async {
+                self.userSession?.currentUser = appUser
                 self.onDismiss?()
             }
         } catch {
@@ -59,6 +63,7 @@ class SignupViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var errorMessage: String = ""
+    @EnvironmentObject var userSession: UserSession
     
     func signup() {
         realmApp.emailPasswordAuth.registerUser(email: email, password: password) { [self] (error) in
@@ -90,18 +95,45 @@ class SignupViewModel: ObservableObject {
         }
     }
     
+    private func getDefaultCategories() -> [Category] {
+        return [
+            Category(id: UUID().uuidString, emoji: "⚽️", name: "Sport", targetTime: 3600, completedTime: 0, goalCards: []),
+            Category(id: UUID().uuidString, emoji: "📚", name: "Study", targetTime: 3600, completedTime: 0, goalCards: []),
+            Category(id: UUID().uuidString, emoji: "🎸", name: "Music", targetTime: 3600, completedTime: 0, goalCards: []),
+            Category(id: UUID().uuidString, emoji: "🎨", name: "Art", targetTime: 3600, completedTime: 0, goalCards: [])
+        ]
+    }
+    
     func storeUserData(userId: String, username: String, level: String) {
         let user = realmApp.currentUser!
         let mongoClient = user.mongoClient("mongodb-atlas")
         let database = mongoClient.database(named: "10000H")
-        let collection = database.collection(withName: "users")
+        let usersCollection = database.collection(withName: "users")
+        let categoriesCollection = database.collection(withName: "category")
         
+
+        let defaultCategories = getDefaultCategories()
+
+        // Store default categories in the database
+        let viewModel = CategoryViewModel()
+        for category in defaultCategories {
+            Task {
+                do {
+                    let currUser = User(id: user.id, email: email, username: username, level: level, categories: [])
+                    try await viewModel.addCategory(category, to: currUser)
+                    print("Category \(category.name) inserted successfully")
+                }
+            }
+        }
+
+        // Update user document with default category IDs
         let updateData: [String: AnyBSON] = [
             "username": .string(username),
-            "level": .string(level)
+            "level": .string(level),
+            "categories": .array(defaultCategories.map { AnyBSON($0.id) })
         ]
-        
-        collection.updateOneDocument(
+
+        usersCollection.updateOneDocument(
             filter: ["_id": AnyBSON(stringLiteral: userId)],
             update: ["$set": AnyBSON(updateData)],
             upsert: true
@@ -110,7 +142,7 @@ class SignupViewModel: ObservableObject {
             case .failure(let error):
                 print("Failed to update user data: \(error.localizedDescription)")
             case .success(_):
-                self.errorMessage = "Store successful"
+                print("User data updated successfully")
             }
         }
     }

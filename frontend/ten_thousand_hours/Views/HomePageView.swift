@@ -15,8 +15,8 @@ struct Constants {
     static let inactiveTabColor: Color = .gray
 }
 
-// MARK: - ContentView
-struct ContentView: View {
+// MARK: - HomePageView
+struct HomePageView: View {
     var body: some View {
         NavigationView {
             VStack {
@@ -183,21 +183,33 @@ struct ProfileButtons: View {
 
 // MARK: - Categories
 struct Categories: View {
+    @EnvironmentObject var userSession: UserSession
+    @StateObject var categoryViewModel = CategoryViewModel()
+    
+    private var gridLayout: [GridItem] {
+        Array(repeating: .init(.flexible()), count: 4)
+    }
+    
     var body: some View {
-        VStack {
-            HStack {
-                CircleButtonView(emoji: "⚽️", label: "Sport")
-                CircleButtonView(emoji: "🎨", label: "Design")
-                CircleButtonView(emoji: "💻", label: "Tech", destination: AnyView(Bside()))
-                CircleButtonView(emoji: "🍪", label: "Cook")
+        if let currentUser = userSession.currentUser {
+            ScrollView {
+                LazyVGrid(columns: gridLayout, spacing: 20) {
+                    ForEach(categoryViewModel.userCategories, id: \.id) { category in
+                        CircleButtonView(emoji: category.emoji, label: category.name, destination: AnyView(Bside()))
+                    }
+                    CircleButtonView(emoji: "➕", label: "Add", destination: AnyView(AddCategoryView()))
+                }
+                .padding(.top, 20)
+                .padding(.horizontal, 25)
             }
-            HStack {
-                CircleButtonView(emoji: "🕺", label: "Dance")
-                CircleButtonView(emoji: "🥁", label: "Music")
-                CircleButtonView(emoji: "➕", label: "Add")
+            .onAppear {
+                Task {
+                    await categoryViewModel.fetchUserCategories(forUserID: currentUser.id)
+                }
             }
+        } else {
+            Text("No user - Categories view")
         }
-        .padding(.top, 20)
     }
 }
 
@@ -448,6 +460,10 @@ struct BottomNavigationBar: View {
 // MARK: - Previews
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
-    }
+            let userSession = UserSession()  // Create a UserSession instance
+            let categoryViewModel = CategoryViewModel()  // Initialize CategoryViewModel with the UserSession
+
+            return HomePageView()
+                .environmentObject(userSession)
+        }
 }

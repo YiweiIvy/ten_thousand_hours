@@ -12,9 +12,12 @@ let realmApp = RealmSwift.App(id: "10000h-ios-dphkm")
 
 @main
 struct ten_thousand_hoursApp: SwiftUI.App {
+    @StateObject var userSession = UserSession()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomePageView()
+                .environmentObject(userSession)
         }
     }
 }
