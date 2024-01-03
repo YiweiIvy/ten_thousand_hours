@@ -81,19 +81,30 @@ struct ProfilePhoto: View {
 
 // MARK: - Name and Tag
 struct NameAndTag: View {
+    @State private var username = "Ivy"
+    @State private var level = "Beginner"
+    @State private var showLogin = true
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Ivy")
-                .font(
-                    Font.custom("DM Sans", size: 18)
-                        .weight(.bold)
-                )
-                .frame(alignment: .leading) // Align text to the left
+            if showLogin {
+                NavigationLink(destination: LoginView(username: $username, level: $level), isActive: $showLogin) {
+                    EmptyView()
+                }
+                .hidden() // Hide the NavigationLink
+            } else {
+                Text(username)
+                    .font(
+                        Font.custom("DM Sans", size: 18)
+                            .weight(.bold)
+                    )
+                    .frame(alignment: .leading) // Align text to the left
+            }
             
-            Text("Beginner")
+            Text(level)
                 .font(Font.custom("DM Sans", size: 10))
                 .foregroundColor(Color.white) // Set the font color to white
-                .frame(width: 45, height: 15) // Set the frame size
+                .frame(width: 60, height: 20) // Set the frame size
                 .padding(.horizontal, 8) // Horizontal padding
                 .padding(.top, 0) // Top padding
                 .padding(.bottom, 1) // Bottom padding
@@ -235,15 +246,15 @@ struct CircleButtonView: View {
 struct TaskScrollView: View {
     
     // Two-dimensional array to hold tasks in pairs
-    private var taskPairs: [[Task]] {
-        var pairs: [[Task]] = []
-        for index in stride(from: 0, to: Task.allTasks.count, by: 2) {
-            var pair: [Task] = []
-            if index < Task.allTasks.count {
-                pair.append(Task.allTasks[index])
+    private var taskPairs: [[TaskCard]] {
+        var pairs: [[TaskCard]] = []
+        for index in stride(from: 0, to: TaskCard.allTasks.count, by: 2) {
+            var pair: [TaskCard] = []
+            if index < TaskCard.allTasks.count {
+                pair.append(TaskCard.allTasks[index])
             }
-            if index + 1 < Task.allTasks.count {
-                pair.append(Task.allTasks[index + 1])
+            if index + 1 < TaskCard.allTasks.count {
+                pair.append(TaskCard.allTasks[index + 1])
             }
             pairs.append(pair)
         }
@@ -302,7 +313,7 @@ struct TasksView: View {
 }
 
 struct ProgressView: View {
-    let task: Task // Your Task model
+    let task: TaskCard // Your Task model
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -376,7 +387,7 @@ struct ProgressView: View {
     }
 }
 
-struct Task: Identifiable, Hashable { // Conform to Hashable
+struct TaskCard: Identifiable, Hashable { // Conform to Hashable
     let id: UUID = UUID()
     let title: String
     let iconName: String
@@ -390,16 +401,16 @@ struct Task: Identifiable, Hashable { // Conform to Hashable
     }
 
     // Make sure to also provide an equality operator for Hashable conformance
-    static func == (lhs: Task, rhs: Task) -> Bool {
+    static func == (lhs: TaskCard, rhs: TaskCard) -> Bool {
         lhs.id == rhs.id
     }
     
     // Sample data
     static let allTasks = [
-        Task(title: "Web Design", iconName: "🎨", progress: 0.44, goalText: "Goal: 100h", color:"MyOrange"),
-        Task(title: "Python", iconName: "💻", progress: 0.80, goalText: "Goal: 50h", color:"MyBlue"),
-        Task(title: "Python", iconName: "💻", progress: 0.25, goalText: "Goal: 50h", color:"MyBlue"),
-        Task(title: "Python", iconName: "🎨", progress: 0.50, goalText: "Goal: 50h", color:"MyGreen"),
+        TaskCard(title: "Web Design", iconName: "🎨", progress: 0.44, goalText: "Goal: 100h", color:"MyOrange"),
+        TaskCard(title: "Python", iconName: "💻", progress: 0.80, goalText: "Goal: 50h", color:"MyBlue"),
+        TaskCard(title: "Python", iconName: "💻", progress: 0.25, goalText: "Goal: 50h", color:"MyBlue"),
+        TaskCard(title: "Python", iconName: "🎨", progress: 0.50, goalText: "Goal: 50h", color:"MyGreen"),
         // Add more tasks here...
     ]
 }

@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import RealmSwift
+
+let realmApp = RealmSwift.App(id: "10000h-ios-dphkm")
 
 @main
-struct ten_thousand_hoursApp: App {
+struct ten_thousand_hoursApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
             ContentView()
