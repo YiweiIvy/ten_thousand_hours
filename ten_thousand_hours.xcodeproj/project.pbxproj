@@ -12,31 +12,29 @@
 		953A36072B3ED5AA00DD36AC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36062B3ED5A900DD36AC /* LoginView.swift */; };
 		953A36092B3EDD1200DD36AC /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36082B3EDD1200DD36AC /* SignupView.swift */; };
 		953A360E2B3FEC6300DD36AC /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A360D2B3FEC6300DD36AC /* Model.swift */; };
-		953A36112B3FECA300DD36AC /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36102B3FECA200DD36AC /* AuthViewModel.swift */; };
+		953A36112B3FECA300DD36AC /* AuthModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36102B3FECA200DD36AC /* AuthModel.swift */; };
 		953A36132B4111CF00DD36AC /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36122B4111CF00DD36AC /* AddCategoryView.swift */; };
-		953A36152B41184A00DD36AC /* TaskAndCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36142B41184A00DD36AC /* TaskAndCategoryViewModel.swift */; };
+		953A36152B41184A00DD36AC /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36142B41184A00DD36AC /* CategoryModel.swift */; };
 		954D4E222B06B06100446756 /* ten_thousand_hoursApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954D4E212B06B06100446756 /* ten_thousand_hoursApp.swift */; };
 		954D4E262B06B06300446756 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 954D4E252B06B06300446756 /* Assets.xcassets */; };
 		954D4E292B06B06300446756 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 954D4E282B06B06300446756 /* Preview Assets.xcassets */; };
 		95A4177D2B11947D00D9DCE2 /* SecondPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A4177C2B11947D00D9DCE2 /* SecondPage.swift */; };
 		95CF01C22B11A71A0046E209 /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95CF01C12B11A71A0046E209 /* HomePageView.swift */; };
-		982D36462B4BF3D000748823 /* TimingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 982D36452B4BF3D000748823 /* TimingPage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		953A36062B3ED5A900DD36AC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		953A36082B3EDD1200DD36AC /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
 		953A360D2B3FEC6300DD36AC /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
-		953A36102B3FECA200DD36AC /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		953A36102B3FECA200DD36AC /* AuthModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthModel.swift; sourceTree = "<group>"; };
 		953A36122B4111CF00DD36AC /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
-		953A36142B41184A00DD36AC /* TaskAndCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAndCategoryViewModel.swift; sourceTree = "<group>"; };
+		953A36142B41184A00DD36AC /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		954D4E1E2B06B06100446756 /* ten_thousand_hours.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ten_thousand_hours.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		954D4E212B06B06100446756 /* ten_thousand_hoursApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ten_thousand_hoursApp.swift; sourceTree = "<group>"; };
 		954D4E252B06B06300446756 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		954D4E282B06B06300446756 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		95A4177C2B11947D00D9DCE2 /* SecondPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondPage.swift; sourceTree = "<group>"; };
 		95CF01C12B11A71A0046E209 /* HomePageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
-		982D36452B4BF3D000748823 /* TimingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimingPage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +58,6 @@
 				953A36062B3ED5A900DD36AC /* LoginView.swift */,
 				953A36082B3EDD1200DD36AC /* SignupView.swift */,
 				95A4177C2B11947D00D9DCE2 /* SecondPage.swift */,
-				982D36452B4BF3D000748823 /* TimingPage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -76,8 +73,8 @@
 		953A360F2B3FEC8100DD36AC /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				953A36102B3FECA200DD36AC /* AuthViewModel.swift */,
-				953A36142B41184A00DD36AC /* TaskAndCategoryViewModel.swift */,
+				953A36102B3FECA200DD36AC /* AuthModel.swift */,
+				953A36142B41184A00DD36AC /* CategoryModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -198,14 +195,13 @@
 			files = (
 				954D4E222B06B06100446756 /* ten_thousand_hoursApp.swift in Sources */,
 				953A360E2B3FEC6300DD36AC /* Model.swift in Sources */,
-				982D36462B4BF3D000748823 /* TimingPage.swift in Sources */,
 				953A36132B4111CF00DD36AC /* AddCategoryView.swift in Sources */,
 				95A4177D2B11947D00D9DCE2 /* SecondPage.swift in Sources */,
 				953A36072B3ED5AA00DD36AC /* LoginView.swift in Sources */,
 				95CF01C22B11A71A0046E209 /* HomePageView.swift in Sources */,
 				953A36092B3EDD1200DD36AC /* SignupView.swift in Sources */,
-				953A36152B41184A00DD36AC /* TaskAndCategoryViewModel.swift in Sources */,
-				953A36112B3FECA300DD36AC /* AuthViewModel.swift in Sources */,
+				953A36152B41184A00DD36AC /* CategoryModel.swift in Sources */,
+				953A36112B3FECA300DD36AC /* AuthModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
