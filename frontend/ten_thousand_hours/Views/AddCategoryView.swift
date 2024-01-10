@@ -10,7 +10,7 @@ import SwiftUI
 struct AddCategoryView: View {
     @State private var emoji: String = ""
     @State private var name: String = ""
-    @State private var targetTime: TimeInterval = 100000
+    @State private var targetTime: TimeInterval = 10000
     @FocusState private var isInputActive: Bool
     @EnvironmentObject var userSession: UserSession
     @Environment(\.presentationMode) var presentationMode

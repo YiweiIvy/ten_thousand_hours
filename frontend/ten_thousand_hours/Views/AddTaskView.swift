@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddTaskView: View {
     @State private var name: String = ""
-    @State private var targetTime: TimeInterval = 100000
+    @State private var targetTime: TimeInterval = 10000
     @State private var categoryId: String
     @EnvironmentObject var userSession: UserSession
     @Environment(\.presentationMode) var presentationMode
