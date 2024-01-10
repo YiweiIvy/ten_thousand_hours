@@ -91,7 +91,7 @@ class CategoryViewModel: ObservableObject {
                     name: doc["name"]??.stringValue ?? "",
                     targetTime: doc["targetTime"]??.doubleValue ?? 100000,
                     completedTime: doc["completedTime"]??.doubleValue ?? 0,
-                    goalCards: doc["goalCards"]??.arrayValue?.compactMap { $0?.stringValue } ?? []
+                    tasks: doc["tasks"]??.arrayValue?.compactMap { $0?.stringValue } ?? []
                 )
             }
         } catch {

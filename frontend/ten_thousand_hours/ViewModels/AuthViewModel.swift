@@ -97,10 +97,10 @@ class SignupViewModel: ObservableObject {
     
     private func getDefaultCategories() -> [Category] {
         return [
-            Category(id: UUID().uuidString, emoji: "⚽️", name: "Sport", targetTime: 3600, completedTime: 0, goalCards: []),
-            Category(id: UUID().uuidString, emoji: "📚", name: "Study", targetTime: 3600, completedTime: 0, goalCards: []),
-            Category(id: UUID().uuidString, emoji: "🎸", name: "Music", targetTime: 3600, completedTime: 0, goalCards: []),
-            Category(id: UUID().uuidString, emoji: "🎨", name: "Art", targetTime: 3600, completedTime: 0, goalCards: [])
+            Category(id: UUID().uuidString, emoji: "⚽️", name: "Sport", targetTime: 3600, completedTime: 0, tasks: []),
+            Category(id: UUID().uuidString, emoji: "📚", name: "Study", targetTime: 3600, completedTime: 0, tasks: []),
+            Category(id: UUID().uuidString, emoji: "🎸", name: "Music", targetTime: 3600, completedTime: 0, tasks: []),
+            Category(id: UUID().uuidString, emoji: "🎨", name: "Art", targetTime: 3600, completedTime: 0, tasks: [])
         ]
     }
     

@@ -7,12 +7,18 @@ extension Color {
     static let textGray = Color(red: 142 / 255, green: 142 / 255, blue: 147 / 255)
 }
 
-struct Bside: View {
+struct CategoryPage: View {
+    var category: Category
+    
     var body: some View {
         ZStack {
             Color.backgroundGray.edgesIgnoringSafeArea(.all)
             VStack {
-                GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
+                GoalProgressView(
+                    title: category.name,
+                    progress: Float(category.completedTime / category.targetTime),
+                    goalText: "Goal: \(Int(category.targetTime))h"  // Convert TimeInterval to Int and then to String
+                )
                 ProgressGridView(items: [
                     ProgressItem(title: "Python", color: .green, progress: 0.6, icon: "laptopcomputer"),
                     ProgressItem(title: "Java", color: .blue, progress: 0.6, icon: "laptopcomputer"),
@@ -32,6 +38,7 @@ struct GoalProgressView: View {
     var title: String
     var progress: Float
     var goalText: String
+    @State private var navigateToAddTask = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -97,9 +104,9 @@ struct GoalProgressView: View {
                 Spacer()
                 
                 Button(action: {
-                    // Actions to continue
+                    navigateToAddTask = true
                 }) {
-                    Text("Continue")
+                    Text("Add Task")
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                         .background(Color.blue)
@@ -107,6 +114,13 @@ struct GoalProgressView: View {
                         .clipShape(Capsule())
                 }
                 .shadow(radius: 1)
+                .background(
+                    NavigationLink(
+                        destination: AddTaskView(),
+                        isActive: $navigateToAddTask
+                    ) { EmptyView() }
+                    .hidden()
+                )
             }
         }
         .padding()
@@ -208,6 +222,7 @@ struct ProgressCell: View {
 
 struct Bside_Previews: PreviewProvider {
     static var previews: some View {
-        Bside()
+        let mockCategory = Category(id: "1", emoji: "S", name: "Sample Category", targetTime: 10000, completedTime: 3000, tasks: [])
+        CategoryPage(category: mockCategory)
     }
 }

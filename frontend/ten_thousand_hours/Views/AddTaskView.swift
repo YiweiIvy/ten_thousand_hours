@@ -1,13 +1,13 @@
 //
-//  AddCategoryView.swift
+//  AddTaskView.swift
 //  ten_thousand_hours
 //
-//  Created by 余懿炜 on 12/31/23.
+//  Created by 余懿炜 on 1/10/24.
 //
 
 import SwiftUI
 
-struct AddCategoryView: View {
+struct AddTaskView: View {
     @State private var emoji: String = ""
     @State private var name: String = ""
     @State private var targetTime: TimeInterval = 100000
@@ -29,7 +29,7 @@ struct AddCategoryView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
-            Button("Add Category") {
+            Button("Add Task") {
                 if let currentUser = userSession.currentUser {
                     // Your view code that requires currentUser
                     print(currentUser)
@@ -61,8 +61,6 @@ struct AddCategoryView: View {
     }
 }
 
-
-
 #Preview {
-    AddCategoryView()
+    AddTaskView()
 }
