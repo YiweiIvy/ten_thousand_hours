@@ -133,7 +133,7 @@ class TaskViewModel: ObservableObject {
         let mongoClient = realmApp.currentUser!.mongoClient("mongodb-atlas")
         let database = mongoClient.database(named: "10000H")
         let tasksCollection = database.collection(withName: "task")
-
+        
         // Create a task document
         let categoriesCollection = database.collection(withName: "category")
         let taskDocument: [String: AnyBSON] = [
@@ -142,22 +142,36 @@ class TaskViewModel: ObservableObject {
             "targetTime": .double(task.targetTime),
             "completedTime": .double(task.completedTime)
         ]
-
+        
         do {
             isLoading = true
+            DispatchQueue.main.async {
+                self.tasks.append(task) // Update UI immediately
+            }
             // Insert the task into the 'task' collection
             _ = try await tasksCollection.insertOne(taskDocument)
-
+            
             // Update the category document to include the task's ID
             let updateResult = try await categoriesCollection.updateOneDocument(
                 filter: ["id": AnyBSON(categoryId)],
                 update: ["$addToSet": ["tasks": AnyBSON(task.id)]]
             )
             print("Updated category with new task, matched count: \(updateResult.matchedCount), modified count: \(updateResult.modifiedCount)")
-            isLoading = false
         } catch {
             print("Error adding task or updating category: \(error.localizedDescription)")
-            isLoading = false
+        }
+        
+        DispatchQueue.main.async {
+            self.tasks.append(task)
+            self.isLoading = false
+        }
+    }
+    
+    func fetchTasksIfNeeded(for category: Category) {
+        guard !isLoading else { return }
+        isLoading = true
+        Task {
+            await fetchTasks(withIds: category.tasks)
         }
     }
 }

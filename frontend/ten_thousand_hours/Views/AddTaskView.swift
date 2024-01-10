@@ -27,21 +27,20 @@ struct AddTaskView: View {
             TextField("Task Name", text: $name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
+            
             TextField("Target Time", value: $targetTime, formatter: NumberFormatter())
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
+            
             Button("Add Task") {
-                    let newTask = TaskItem(id: UUID().uuidString, name: name, targetTime: targetTime, completedTime: 0)
-                    Task {
-                        await taskViewModel.addTask(newTask, toCategoryId: categoryId)
-                        DispatchQueue.main.async {
-                            self.presentationMode.wrappedValue.dismiss()
-                            self.onDismiss() // Notify on dismissal
-                        }
+                let newTask = TaskItem(id: UUID().uuidString, name: name, targetTime: targetTime, completedTime: 0)
+                Task {
+                    await taskViewModel.addTask(newTask, toCategoryId: categoryId)
+                    DispatchQueue.main.async {
+                        self.presentationMode.wrappedValue.dismiss() // Dismiss the view
                     }
                 }
+            }
         }
         .padding()
     }

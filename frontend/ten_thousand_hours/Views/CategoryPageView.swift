@@ -14,35 +14,41 @@ struct CategoryPage: View {
     var body: some View {
         ZStack {
             Color.backgroundGray.edgesIgnoringSafeArea(.all)
-
             if taskViewModel.isLoading {
-               Text("Loading Tasks...")
+                Text("Loading Tasks...")
             } else {
-                VStack {
-                    GoalProgressView(
-                        category: category,
-                        taskViewModel: taskViewModel,
-                        title: category.name,
-                        progress: Float(category.completedTime / category.targetTime),
-                        goalText: "Goal: \(Int(category.targetTime))h"
-                    )
-                    ProgressGridView(items: taskViewModel.tasks.map { task in
-                        ProgressItem(
-                            title: task.name,
-                            color: .green, // Dynamic setting can be applied
-                            progress: Float(task.completedTime / task.targetTime),
-                            icon: "laptopcomputer" // Default icon; modify as needed
-                        )
-                    })
-                    Spacer()
-                    BottomNavigationBar()
-                }
+                CategoryContentView(category: category, taskViewModel: taskViewModel)
             }
         }
         .onAppear {
-            Task {
-                await taskViewModel.fetchTasks(withIds: category.tasks)
-            }
+            taskViewModel.fetchTasksIfNeeded(for: category)
+        }
+    }
+}
+
+struct CategoryContentView: View {
+    var category: Category
+    @ObservedObject var taskViewModel: TaskViewModel
+    
+    var body: some View {
+        VStack {
+            GoalProgressView(
+                category: category,
+                taskViewModel: taskViewModel,
+                title: category.name,
+                progress: Float(category.completedTime / category.targetTime),
+                goalText: "Goal: \(Int(category.targetTime))h"
+            )
+            ProgressGridView(items: taskViewModel.tasks.map { task in
+                ProgressItem(
+                    title: task.name,
+                    color: .green, // Dynamic setting can be applied
+                    progress: Float(task.completedTime / task.targetTime),
+                    icon: "laptopcomputer" // Default icon; modify as needed
+                )
+            })
+            Spacer()
+            BottomNavigationBar()
         }
     }
 }
@@ -138,7 +144,9 @@ struct GoalProgressView: View {
                             }
                         }),
                         isActive: $navigateToAddTask
-                    ) { EmptyView() }
+                    ) {
+                        Text("Add Task")
+                    }
                         .hidden()
                 )
             }
@@ -159,12 +167,14 @@ struct ProgressGridView: View {
     var items: [ProgressItem]
     
     var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-            ForEach(items, id: \.title) { item in
-                ProgressCell(item: item)
+        ScrollView(.vertical) { // Wrap in a ScrollView with vertical scrolling
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                ForEach(items, id: \.title) { item in
+                    ProgressCell(item: item)
+                }
             }
+            .padding()
         }
-        .padding()
     }
 }
 

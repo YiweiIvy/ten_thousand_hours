@@ -89,7 +89,7 @@ class SignupViewModel: ObservableObject {
                 case .success(let user):
                     // User is now logged in, can store additional data
                     self.errorMessage = "Login after signup succeeded"
-                    self.storeUserData(userId: user.id, username: self.username, level: "BeginnerCat")
+                    self.storeUserData(userId: user.id, username: self.username, level: "Beginner")
                 }
             }
         }
