@@ -8,59 +8,41 @@
 import SwiftUI
 
 struct AddTaskView: View {
-    @State private var emoji: String = ""
     @State private var name: String = ""
     @State private var targetTime: TimeInterval = 100000
-    @FocusState private var isInputActive: Bool
+    @State private var categoryId: String
     @EnvironmentObject var userSession: UserSession
     @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var taskViewModel: TaskViewModel
+    var onDismiss: () -> Void
+    
+    init(categoryId: String, taskViewModel: TaskViewModel, onDismiss: @escaping () -> Void) {
+        self._categoryId = State(initialValue: categoryId)
+        self.taskViewModel = taskViewModel
+        self.onDismiss = onDismiss
+    }
     
     var body: some View {
         VStack {
-            TextField("Icon", text: $emoji)
+            TextField("Task Name", text: $name)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            
-            TextField("Name", text: $name)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-            
+
             TextField("Target Time", value: $targetTime, formatter: NumberFormatter())
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            
+
             Button("Add Task") {
-                if let currentUser = userSession.currentUser {
-                    // Your view code that requires currentUser
-                    print(currentUser)
-                    let viewModel = CategoryViewModel()
+                    let newTask = TaskItem(id: UUID().uuidString, name: name, targetTime: targetTime, completedTime: 0)
                     Task {
-                        do {
-                            let newCategory = Category(
-                                id: UUID().uuidString,
-                                emoji: emoji,
-                                name: name,
-                                targetTime: targetTime,
-                                tasks: []
-                            )
-                            try await viewModel.addCategory(newCategory, to: currentUser)
-                            // Dismiss the view after adding the category
-                            DispatchQueue.main.async {
-                                self.presentationMode.wrappedValue.dismiss()
-                            }
+                        await taskViewModel.addTask(newTask, toCategoryId: categoryId)
+                        DispatchQueue.main.async {
+                            self.presentationMode.wrappedValue.dismiss()
+                            self.onDismiss() // Notify on dismissal
                         }
                     }
-                    
-                } else {
-                    // Your view code for when currentUser is not available
-                    print("no user")
                 }
-            }
         }
         .padding()
     }
-}
-
-#Preview {
-    AddTaskView()
 }

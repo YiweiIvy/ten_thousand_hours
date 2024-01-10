@@ -9,32 +9,48 @@ extension Color {
 
 struct CategoryPage: View {
     var category: Category
+    @StateObject var taskViewModel = TaskViewModel()
     
     var body: some View {
         ZStack {
             Color.backgroundGray.edgesIgnoringSafeArea(.all)
-            VStack {
-                GoalProgressView(
-                    title: category.name,
-                    progress: Float(category.completedTime / category.targetTime),
-                    goalText: "Goal: \(Int(category.targetTime))h"  // Convert TimeInterval to Int and then to String
-                )
-                ProgressGridView(items: [
-                    ProgressItem(title: "Python", color: .green, progress: 0.6, icon: "laptopcomputer"),
-                    ProgressItem(title: "Java", color: .blue, progress: 0.6, icon: "laptopcomputer"),
-                    ProgressItem(title: "Security", color: .blue, progress: 0.3, hours: 15, icon: "lock.shield"),
-                    ProgressItem(title: "CPU", color: .green, progress: 0.6, icon: "cpu"),
-                    ProgressItem(title: "OS", color: .orange, progress: 0.6, icon: "desktopcomputer"),
-                    ProgressItem(title: "Frontend", color: .blue, progress: 0.6, icon: "paintbrush.pointed")
-                ])
-                Spacer()
-                BottomNavigationBar()
+
+            if taskViewModel.isLoading {
+               Text("Loading Tasks...")
+            } else {
+                VStack {
+                    GoalProgressView(
+                        category: category,
+                        taskViewModel: taskViewModel,
+                        title: category.name,
+                        progress: Float(category.completedTime / category.targetTime),
+                        goalText: "Goal: \(Int(category.targetTime))h"
+                    )
+                    ProgressGridView(items: taskViewModel.tasks.map { task in
+                        ProgressItem(
+                            title: task.name,
+                            color: .green, // Dynamic setting can be applied
+                            progress: Float(task.completedTime / task.targetTime),
+                            icon: "laptopcomputer" // Default icon; modify as needed
+                        )
+                    })
+                    Spacer()
+                    BottomNavigationBar()
+                }
+            }
+        }
+        .onAppear {
+            Task {
+                await taskViewModel.fetchTasks(withIds: category.tasks)
             }
         }
     }
 }
 
+
 struct GoalProgressView: View {
+    var category: Category
+    @ObservedObject var taskViewModel: TaskViewModel
     var title: String
     var progress: Float
     var goalText: String
@@ -116,10 +132,14 @@ struct GoalProgressView: View {
                 .shadow(radius: 1)
                 .background(
                     NavigationLink(
-                        destination: AddTaskView(),
+                        destination: AddTaskView(categoryId: category.id, taskViewModel: taskViewModel, onDismiss: {
+                            Task {
+                                await taskViewModel.fetchTasks(withIds: category.tasks)
+                            }
+                        }),
                         isActive: $navigateToAddTask
                     ) { EmptyView() }
-                    .hidden()
+                        .hidden()
                 )
             }
         }

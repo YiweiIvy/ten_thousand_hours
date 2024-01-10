@@ -26,7 +26,7 @@ struct Category: Identifiable {
 
 struct TaskItem {
     var id: String
-    var Name: String
+    var name: String
     var targetTime: TimeInterval  // Target time for this goal card
     var completedTime: TimeInterval  // Time already completed for this goal card
 }
