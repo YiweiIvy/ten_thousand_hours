@@ -11,6 +11,7 @@ import RealmSwift
 struct SignupView: View {
     @StateObject private var viewModel = SignupViewModel() // Instantiate ViewModel
     @State private var errorMessage = ""
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack {
@@ -33,7 +34,10 @@ struct SignupView: View {
 
             Button("Sign Up") {
                 Task {
-                    viewModel.signup() // Call signup on ViewModel
+                    viewModel.signup()// Call signup on ViewModel
+                    viewModel.onDismiss = {
+                        dismiss()
+                    }
                 }
             }
             .padding()

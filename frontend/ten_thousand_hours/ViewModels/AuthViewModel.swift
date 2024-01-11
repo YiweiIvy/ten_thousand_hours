@@ -64,6 +64,7 @@ class SignupViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var errorMessage: String = ""
     @EnvironmentObject var userSession: UserSession
+    var onDismiss: (() -> Void)?
     
     func signup() {
         realmApp.emailPasswordAuth.registerUser(email: email, password: password) { [self] (error) in
@@ -74,6 +75,7 @@ class SignupViewModel: ObservableObject {
                     // User successfully registered, now log them in
                     self.loginAfterSignup(email: self.email, password: self.password)
                     self.errorMessage = "Signup successful"
+                    self.onDismiss?()
                 }
             }
         }
