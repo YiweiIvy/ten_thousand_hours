@@ -59,6 +59,7 @@ class TaskViewModel: ObservableObject {
     @Published var tasks: [TaskItem] = []
     @Published var isLoading = false
     let tasksUpdated = PassthroughSubject<Void, Never>()
+    @Published var currentCategory: Category?
     
     func fetchTasks(withIds taskIds: [String]) async {
         isLoading = true
@@ -100,7 +101,6 @@ class TaskViewModel: ObservableObject {
         ]
         
         do {
-            isLoading = true
             // Insert the task into the 'task' collection
             _ = try await tasksCollection.insertOne(taskDocument)
             
@@ -110,20 +110,47 @@ class TaskViewModel: ObservableObject {
                 update: ["$addToSet": ["tasks": AnyBSON(task.id)]]
             )
             print("Updated category with new task, matched count: \(updateResult.matchedCount), modified count: \(updateResult.modifiedCount)")
-            tasksUpdated.send()
-            self.isLoading = false
         } catch {
-            self.isLoading = false
             print("Error adding task or updating category: \(error.localizedDescription)")
         }
     }
     
-    func fetchTasksIfNeeded(for category: Category) {
-        guard !isLoading else { return }
-        isLoading = true
+    func fetchCategory(withId id: String) {
         Task {
-            await fetchTasks(withIds: category.tasks)
+            await fetchCategoryAsync(withId: id)
         }
-        self.isLoading = false
+    }
+    
+    private func fetchCategoryAsync(withId id: String) async {
+        let mongoClient = realmApp.currentUser!.mongoClient("mongodb-atlas")
+        let database = mongoClient.database(named: "10000H")
+        let categoriesCollection = database.collection(withName: "category")
+        
+        let query: [String: AnyBSON] = ["id": AnyBSON(id)]
+        
+        do {
+            let categoryDocuments = try await categoriesCollection.find(filter: query)
+            if let firstDocument = categoryDocuments.first {
+                let id: String = firstDocument["id"]??.stringValue ?? ""
+                let emoji: String = firstDocument["emoji"]??.stringValue ?? ""
+                let name: String = firstDocument["name"]??.stringValue ?? ""
+                let targetTime: Double = firstDocument["targetTime"]??.doubleValue ?? 100000
+                let completedTime: Double = firstDocument["completedTime"]??.doubleValue ?? 0
+                let tasks: [String] = firstDocument["tasks"]??.arrayValue?.compactMap { $0?.stringValue } ?? []
+                
+                DispatchQueue.main.async {
+                    self.currentCategory = Category(
+                        id: id,
+                        emoji: emoji,
+                        name: name,
+                        targetTime: targetTime,
+                        completedTime: completedTime,
+                        tasks: tasks
+                    )
+                }
+            }
+        } catch {
+            print("Error fetching category: \(error.localizedDescription)")
+        }
     }
 }
