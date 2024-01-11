@@ -159,19 +159,13 @@ struct GoalProgressView: View {
 struct ProgressGridView: View {
     @ObservedObject var taskViewModel: TaskViewModel
     
+    
     var body: some View {
-        let items = taskViewModel.tasks.map { task in
-            ProgressItem(
-                title: task.name,
-                color: .green, // Dynamic setting can be applied
-                progress: Float(task.completedTime / task.targetTime),
-                icon: "laptopcomputer" // Default icon; modify as needed
-            )
-        }
+        let items = taskViewModel.tasks
         ScrollView(.vertical) { // Wrap in a ScrollView with vertical scrolling
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-                ForEach(items, id: \.title) { item in
-                    ProgressCell(item: item)
+                ForEach(items) { item in
+                    ProgressCell(item: item, taskViewModel: taskViewModel)
                 }
             }
             .padding()
@@ -179,16 +173,10 @@ struct ProgressGridView: View {
     }
 }
 
-struct ProgressItem {
-    var title: String
-    var color: Color
-    var progress: Float
-    var hours: Int? = nil
-    var icon: String
-}
 
 struct ProgressCell: View {
-    var item: ProgressItem
+    var item: TaskItem
+    @ObservedObject var taskViewModel: TaskViewModel
 
     var body: some View {
         VStack {
@@ -203,7 +191,7 @@ struct ProgressCell: View {
 
                 Spacer()
 
-                Text(item.title) // Text on the right
+                Text(item.name) // Text on the right
                     .font(.headline)
                     .foregroundColor(.black)
             }
@@ -226,23 +214,30 @@ struct ProgressCell: View {
                     .frame(width: 70, height: 70)
 
                 Circle()
-                    .trim(from: 0.0, to: CGFloat(min(self.item.progress, 1.0)))
-                    .stroke(item.color, lineWidth: 6)
+                    .trim(from: 0.0, to: CGFloat(min(item.completedTime / item.targetTime, 1.0)))
+                    .stroke(Color.green, lineWidth: 6)
                     .frame(width: 70, height: 70)
                     .rotationEffect(Angle(degrees: 270.0))
 
-                Text("\(Int(item.progress * 100))%") // Percentage
+                Text("\(Int(item.completedTime / item.targetTime * 100))%") // Percentage
                     .font(.caption)
                     .foregroundColor(.black)
             }
             .padding(.top, 5)
 
-            // Hours (if available)
-            if let hours = item.hours {
-                Text("\(hours)h")
-                    .font(.caption)
-                    .foregroundColor(Color.textGray)
+            Text(String(format: "%.2f / %.2f h", item.completedTime, item.targetTime))
+                .font(.caption)
+                .foregroundColor(Color.textGray)
+            
+            NavigationLink(destination: TimerPageView(task: item, taskViewModel: taskViewModel)) {
+                Text("Go to Timer")
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .clipShape(Capsule())
             }
+            .padding(.top, 10)
         }
         .padding()
         .background(Color.white)

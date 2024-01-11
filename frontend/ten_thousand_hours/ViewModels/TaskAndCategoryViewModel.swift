@@ -153,4 +153,39 @@ class TaskViewModel: ObservableObject {
             print("Error fetching category: \(error.localizedDescription)")
         }
     }
+    
+    func updateCompletedTimeForTask(taskId: String, additionalTime: TimeInterval) async {
+        let mongoClient = realmApp.currentUser!.mongoClient("mongodb-atlas")
+        let database = mongoClient.database(named: "10000H")
+        let tasksCollection = database.collection(withName: "task")
+
+        do {
+            print("additionTime: \(additionalTime)")
+            let updateResult = try await tasksCollection.updateOneDocument(
+                filter: ["id": AnyBSON(taskId)],
+                update: ["$inc": ["completedTime": AnyBSON(additionalTime)]]
+            )
+            print("Task updated, matched count: \(updateResult.matchedCount), modified count: \(updateResult.modifiedCount)")
+        } catch {
+            print("Error updating task's completed time: \(error.localizedDescription)")
+        }
+    }
+    
+    func updateCompletedTimeForCategory(additionalTime: TimeInterval) async {
+        guard let categoryId = currentCategory?.id else { return }
+        
+        let mongoClient = realmApp.currentUser!.mongoClient("mongodb-atlas")
+        let database = mongoClient.database(named: "10000H")
+        let categoriesCollection = database.collection(withName: "category")
+
+        do {
+            let updateResult = try await categoriesCollection.updateOneDocument(
+                filter: ["id": AnyBSON(categoryId)],
+                update: ["$inc": ["completedTime": AnyBSON(additionalTime)]]
+            )
+            print("Category updated, matched count: \(updateResult.matchedCount), modified count: \(updateResult.modifiedCount)")
+        } catch {
+            print("Error updating category's completed time: \(error.localizedDescription)")
+        }
+    }
 }

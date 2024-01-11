@@ -24,7 +24,7 @@ struct Category: Identifiable {
     var tasks: [String]
 }
 
-struct TaskItem {
+struct TaskItem: Identifiable {
     var id: String
     var name: String
     var targetTime: TimeInterval  // Target time for this goal card
