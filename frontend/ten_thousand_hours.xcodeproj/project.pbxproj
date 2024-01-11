@@ -8,11 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		9532B1CB2B4ED56D00B57141 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9532B1CA2B4ED56D00B57141 /* AddTaskView.swift */; };
+		9532B1CD2B4EFF0D00B57141 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9532B1CC2B4EFF0D00B57141 /* CategoryModel.swift */; };
 		953A36022B3ED34E00DD36AC /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 953A36012B3ED34E00DD36AC /* Realm */; };
 		953A36042B3ED34E00DD36AC /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 953A36032B3ED34E00DD36AC /* RealmSwift */; };
 		953A36072B3ED5AA00DD36AC /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36062B3ED5A900DD36AC /* LoginView.swift */; };
 		953A36092B3EDD1200DD36AC /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36082B3EDD1200DD36AC /* SignupView.swift */; };
-		953A360E2B3FEC6300DD36AC /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A360D2B3FEC6300DD36AC /* Model.swift */; };
+		953A360E2B3FEC6300DD36AC /* Definitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A360D2B3FEC6300DD36AC /* Definitions.swift */; };
 		953A36112B3FECA300DD36AC /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36102B3FECA200DD36AC /* AuthViewModel.swift */; };
 		953A36132B4111CF00DD36AC /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36122B4111CF00DD36AC /* AddCategoryView.swift */; };
 		953A36152B41184A00DD36AC /* TaskAndCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 953A36142B41184A00DD36AC /* TaskAndCategoryViewModel.swift */; };
@@ -26,9 +27,10 @@
 
 /* Begin PBXFileReference section */
 		9532B1CA2B4ED56D00B57141 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
+		9532B1CC2B4EFF0D00B57141 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 		953A36062B3ED5A900DD36AC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		953A36082B3EDD1200DD36AC /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
-		953A360D2B3FEC6300DD36AC /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		953A360D2B3FEC6300DD36AC /* Definitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Definitions.swift; sourceTree = "<group>"; };
 		953A36102B3FECA200DD36AC /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		953A36122B4111CF00DD36AC /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
 		953A36142B41184A00DD36AC /* TaskAndCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskAndCategoryViewModel.swift; sourceTree = "<group>"; };
@@ -71,7 +73,8 @@
 		953A360C2B3FEC4300DD36AC /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				953A360D2B3FEC6300DD36AC /* Model.swift */,
+				953A360D2B3FEC6300DD36AC /* Definitions.swift */,
+				9532B1CC2B4EFF0D00B57141 /* CategoryModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -200,8 +203,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9532B1CB2B4ED56D00B57141 /* AddTaskView.swift in Sources */,
+				9532B1CD2B4EFF0D00B57141 /* CategoryModel.swift in Sources */,
 				954D4E222B06B06100446756 /* ten_thousand_hoursApp.swift in Sources */,
-				953A360E2B3FEC6300DD36AC /* Model.swift in Sources */,
+				953A360E2B3FEC6300DD36AC /* Definitions.swift in Sources */,
 				982D36462B4BF3D000748823 /* TimingPage.swift in Sources */,
 				953A36132B4111CF00DD36AC /* AddCategoryView.swift in Sources */,
 				95A4177D2B11947D00D9DCE2 /* CategoryPageView.swift in Sources */,

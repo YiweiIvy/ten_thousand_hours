@@ -9,16 +9,15 @@ extension Color {
 
 struct CategoryPage: View {
     var category: Category
-    @StateObject var taskViewModel = TaskViewModel()
+    @ObservedObject var taskViewModel: TaskViewModel
     
     var body: some View {
         ZStack {
             Color.backgroundGray.edgesIgnoringSafeArea(.all)
-            if taskViewModel.isLoading {
-                Text("Loading Tasks...")
-            } else {
-                CategoryContentView(category: category, taskViewModel: taskViewModel)
-            }
+            CategoryContentView(category: category, taskViewModel: taskViewModel)
+                .onReceive(taskViewModel.tasksUpdated) { // Listen for updates
+                    taskViewModel.fetchTasksIfNeeded(for: category)
+                }
         }
         .onAppear {
             taskViewModel.fetchTasksIfNeeded(for: category)
@@ -39,14 +38,7 @@ struct CategoryContentView: View {
                 progress: Float(category.completedTime / category.targetTime),
                 goalText: "Goal: \(Int(category.targetTime))h"
             )
-            ProgressGridView(items: taskViewModel.tasks.map { task in
-                ProgressItem(
-                    title: task.name,
-                    color: .green, // Dynamic setting can be applied
-                    progress: Float(task.completedTime / task.targetTime),
-                    icon: "laptopcomputer" // Default icon; modify as needed
-                )
-            })
+            ProgressGridView(taskViewModel: taskViewModel)
             Spacer()
             BottomNavigationBar()
         }
@@ -159,14 +151,18 @@ struct GoalProgressView: View {
     }
 }
 
-
-
-
-
 struct ProgressGridView: View {
-    var items: [ProgressItem]
+    @ObservedObject var taskViewModel: TaskViewModel
     
     var body: some View {
+        let items = taskViewModel.tasks.map { task in
+            ProgressItem(
+                title: task.name,
+                color: .green, // Dynamic setting can be applied
+                progress: Float(task.completedTime / task.targetTime),
+                icon: "laptopcomputer" // Default icon; modify as needed
+            )
+        }
         ScrollView(.vertical) { // Wrap in a ScrollView with vertical scrolling
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
                 ForEach(items, id: \.title) { item in
@@ -253,6 +249,6 @@ struct ProgressCell: View {
 struct Bside_Previews: PreviewProvider {
     static var previews: some View {
         let mockCategory = Category(id: "1", emoji: "S", name: "Sample Category", targetTime: 10000, completedTime: 3000, tasks: [])
-        CategoryPage(category: mockCategory)
+        CategoryPage(category: mockCategory, taskViewModel: TaskViewModel())
     }
 }

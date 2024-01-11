@@ -11,10 +11,10 @@ struct AddCategoryView: View {
     @State private var emoji: String = ""
     @State private var name: String = ""
     @State private var targetTime: TimeInterval = 10000
-    @FocusState private var isInputActive: Bool
     @EnvironmentObject var userSession: UserSession
     @Environment(\.presentationMode) var presentationMode
-    
+    @ObservedObject var categoryViewModel: CategoryViewModel
+
     var body: some View {
         VStack {
             TextField("Icon", text: $emoji)
@@ -30,30 +30,16 @@ struct AddCategoryView: View {
                 .padding()
             
             Button("Add Category") {
-                if let currentUser = userSession.currentUser {
-                    // Your view code that requires currentUser
-                    print(currentUser)
-                    let viewModel = CategoryViewModel()
-                    Task {
-                        do {
-                            let newCategory = Category(
-                                id: UUID().uuidString,
-                                emoji: emoji,
-                                name: name,
-                                targetTime: targetTime,
-                                tasks: []
-                            )
-                            try await viewModel.addCategory(newCategory, to: currentUser)
-                            // Dismiss the view after adding the category
-                            DispatchQueue.main.async {
-                                self.presentationMode.wrappedValue.dismiss()
-                            }
-                        }
-                    }
-                    
-                } else {
-                    // Your view code for when currentUser is not available
-                    print("no user")
+                Task {
+                    let newCategory = Category(
+                        id: UUID().uuidString,
+                        emoji: emoji,
+                        name: name,
+                        targetTime: targetTime,
+                        tasks: []
+                    )
+                    await categoryViewModel.addCategory(newCategory)
+                    self.presentationMode.wrappedValue.dismiss()
                 }
             }
         }
@@ -61,8 +47,3 @@ struct AddCategoryView: View {
     }
 }
 
-
-
-#Preview {
-    AddCategoryView()
-}

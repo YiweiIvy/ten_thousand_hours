@@ -184,27 +184,27 @@ struct ProfileButtons: View {
 // MARK: - Categories
 struct Categories: View {
     @EnvironmentObject var userSession: UserSession
-    @StateObject var categoryViewModel = CategoryViewModel()
-    
+    @StateObject var categoryViewModel: CategoryViewModel = CategoryViewModel(model: CategoryModel())
+    @StateObject var taskViewModel = TaskViewModel()
+
     private var gridLayout: [GridItem] {
         Array(repeating: .init(.flexible()), count: 4)
     }
     
     var body: some View {
-        if let currentUser = userSession.currentUser {
+        if userSession.currentUser != nil {
             ScrollView {
                 LazyVGrid(columns: gridLayout, spacing: 20) {
                     ForEach(categoryViewModel.userCategories, id: \.id) { category in
-                        CircleButtonView(emoji: category.emoji, label: category.name, destination: AnyView(CategoryPage(category: category)))
+                        CircleButtonView(emoji: category.emoji, label: category.name, destination: AnyView(CategoryPage(category: category, taskViewModel: taskViewModel)))
                     }
-                    CircleButtonView(emoji: "➕", label: "Add", destination: AnyView(AddCategoryView()))
+                    CircleButtonView(emoji: "➕", label: "Add", destination: AnyView(AddCategoryView(categoryViewModel: categoryViewModel)))
                 }
                 .padding(.top, 20)
                 .padding(.horizontal, 25)
             }
             .onAppear {
-                Task {
-                    await categoryViewModel.fetchUserCategories(forUserID: currentUser.id)
+                Task { categoryViewModel.fetchCategoriesForCurrentUser()
                 }
             }
         } else {
@@ -212,6 +212,7 @@ struct Categories: View {
         }
     }
 }
+
 
 struct CircleButtonView: View {
     var emoji: String
@@ -461,7 +462,6 @@ struct BottomNavigationBar: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
             let userSession = UserSession()  // Create a UserSession instance
-            let categoryViewModel = CategoryViewModel()  // Initialize CategoryViewModel with the UserSession
 
             return HomePageView()
                 .environmentObject(userSession)

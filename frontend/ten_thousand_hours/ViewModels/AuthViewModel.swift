@@ -114,15 +114,13 @@ class SignupViewModel: ObservableObject {
 
         let defaultCategories = getDefaultCategories()
 
-        // Store default categories in the database
-        let viewModel = CategoryViewModel()
+        let model = CategoryModel()
+        let viewModel = CategoryViewModel(model: model)
+
         for category in defaultCategories {
             Task {
-                do {
-                    let currUser = User(id: user.id, email: email, username: username, level: level, categories: [])
-                    try await viewModel.addCategory(category, to: currUser)
-                    print("Category \(category.name) inserted successfully")
-                }
+                await viewModel.addCategory(category)
+                print("Category \(category.name) inserted successfully")
             }
         }
 
