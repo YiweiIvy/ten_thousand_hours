@@ -8,7 +8,14 @@
 import Foundation
 import SwiftUI
 
+import SwiftUI
+
 struct TimerApp: View {
+    @State private var timeElapsed = 0 // Starts at 0 seconds
+    @State private var timerRunning = false
+
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
     var body: some View {
         VStack(spacing: 40) {
             // Task name and icon
@@ -33,13 +40,18 @@ struct TimerApp: View {
                 .foregroundColor(.secondary)
             
             // Timer display
-            Text("14:59")
+            Text(formatTime(timeElapsed))
                 .font(.system(size: 64, weight: .bold, design: .default))
                 .foregroundColor(.primary)
+                .onReceive(timer) { _ in
+                    if self.timerRunning {
+                        self.timeElapsed += 1
+                    }
+                }
             
             // Control buttons
             HStack(spacing: 30) {
-                Button(action: {}) {
+                Button(action: { self.resetTimer() }) {
                     Image(systemName: "ellipsis")
                         .font(.title)
                         .foregroundColor(.blue)
@@ -48,7 +60,7 @@ struct TimerApp: View {
                         .shadow(radius: 10)
                 }
                 
-                Button(action: {}) {
+                Button(action: { self.startTimer() }) {
                     Image(systemName: "play.fill")
                         .font(.title)
                         .foregroundColor(.blue)
@@ -59,7 +71,7 @@ struct TimerApp: View {
             }
             
             // Pause button
-            Button(action: {}) {
+            Button(action: { self.pauseTimer() }) {
                 Image(systemName: "pause.fill")
                     .font(.title)
                     .foregroundColor(.white)
@@ -70,6 +82,27 @@ struct TimerApp: View {
         }
         .padding()
     }
+
+    func startTimer() {
+        timerRunning = true
+    }
+
+    func pauseTimer() {
+        timerRunning = false
+    }
+
+    func resetTimer() {
+        timerRunning = false
+        timeElapsed = 0
+    }
+
+    func formatTime(_ totalSeconds: Int) -> String {
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        // Modify the format if you also want to show hours after a certain period
+        return (hours > 0 ? String(format: "%02d:", hours) : "") + String(format: "%02d:%02d", minutes, seconds)
+    }
 }
 
 struct TimerApp_Previews: PreviewProvider {
@@ -77,3 +110,4 @@ struct TimerApp_Previews: PreviewProvider {
         TimerApp()
     }
 }
+
