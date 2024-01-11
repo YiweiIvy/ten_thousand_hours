@@ -7,31 +7,60 @@ extension Color {
     static let textGray = Color(red: 142 / 255, green: 142 / 255, blue: 147 / 255)
 }
 
-struct Bside: View {
+struct CategoryPage: View {
+    var category: Category
+    @StateObject var taskViewModel = TaskViewModel()
+    
     var body: some View {
         ZStack {
             Color.backgroundGray.edgesIgnoringSafeArea(.all)
-            VStack {
-                GoalProgressView(title: "Tech", progress: 0.5, goalText: "Goal: 10,000h")
-                ProgressGridView(items: [
-                    ProgressItem(title: "Python", color: .green, progress: 0.6, icon: "laptopcomputer"),
-                    ProgressItem(title: "Java", color: .blue, progress: 0.6, icon: "laptopcomputer"),
-                    ProgressItem(title: "Security", color: .blue, progress: 0.3, hours: 15, icon: "lock.shield"),
-                    ProgressItem(title: "CPU", color: .green, progress: 0.6, icon: "cpu"),
-                    ProgressItem(title: "OS", color: .orange, progress: 0.6, icon: "desktopcomputer"),
-                    ProgressItem(title: "Frontend", color: .blue, progress: 0.6, icon: "paintbrush.pointed")
-                ])
-                Spacer()
-                BottomNavigationBar()
+            if taskViewModel.isLoading {
+                Text("Loading Tasks...")
+            } else {
+                CategoryContentView(category: category, taskViewModel: taskViewModel)
             }
+        }
+        .onAppear {
+            taskViewModel.fetchTasksIfNeeded(for: category)
         }
     }
 }
 
+struct CategoryContentView: View {
+    var category: Category
+    @ObservedObject var taskViewModel: TaskViewModel
+    
+    var body: some View {
+        VStack {
+            GoalProgressView(
+                category: category,
+                taskViewModel: taskViewModel,
+                title: category.name,
+                progress: Float(category.completedTime / category.targetTime),
+                goalText: "Goal: \(Int(category.targetTime))h"
+            )
+            ProgressGridView(items: taskViewModel.tasks.map { task in
+                ProgressItem(
+                    title: task.name,
+                    color: .green, // Dynamic setting can be applied
+                    progress: Float(task.completedTime / task.targetTime),
+                    icon: "laptopcomputer" // Default icon; modify as needed
+                )
+            })
+            Spacer()
+            BottomNavigationBar()
+        }
+    }
+}
+
+
 struct GoalProgressView: View {
+    var category: Category
+    @ObservedObject var taskViewModel: TaskViewModel
     var title: String
     var progress: Float
     var goalText: String
+    @State private var navigateToAddTask = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -97,9 +126,9 @@ struct GoalProgressView: View {
                 Spacer()
                 
                 Button(action: {
-                    // Actions to continue
+                    navigateToAddTask = true
                 }) {
-                    Text("Continue")
+                    Text("Add Task")
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                         .background(Color.blue)
@@ -107,6 +136,19 @@ struct GoalProgressView: View {
                         .clipShape(Capsule())
                 }
                 .shadow(radius: 1)
+                .background(
+                    NavigationLink(
+                        destination: AddTaskView(categoryId: category.id, taskViewModel: taskViewModel, onDismiss: {
+                            Task {
+                                await taskViewModel.fetchTasks(withIds: category.tasks)
+                            }
+                        }),
+                        isActive: $navigateToAddTask
+                    ) {
+                        Text("Add Task")
+                    }
+                        .hidden()
+                )
             }
         }
         .padding()
@@ -125,12 +167,14 @@ struct ProgressGridView: View {
     var items: [ProgressItem]
     
     var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-            ForEach(items, id: \.title) { item in
-                ProgressCell(item: item)
+        ScrollView(.vertical) { // Wrap in a ScrollView with vertical scrolling
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                ForEach(items, id: \.title) { item in
+                    ProgressCell(item: item)
+                }
             }
+            .padding()
         }
-        .padding()
     }
 }
 
@@ -208,6 +252,7 @@ struct ProgressCell: View {
 
 struct Bside_Previews: PreviewProvider {
     static var previews: some View {
-        Bside()
+        let mockCategory = Category(id: "1", emoji: "S", name: "Sample Category", targetTime: 10000, completedTime: 3000, tasks: [])
+        CategoryPage(category: mockCategory)
     }
 }
