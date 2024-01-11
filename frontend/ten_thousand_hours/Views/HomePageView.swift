@@ -196,7 +196,7 @@ struct Categories: View {
             ScrollView {
                 LazyVGrid(columns: gridLayout, spacing: 20) {
                     ForEach(categoryViewModel.userCategories, id: \.id) { category in
-                        CircleButtonView(emoji: category.emoji, label: category.name, destination: AnyView(CategoryPage(category: category, taskViewModel: taskViewModel)))
+                        CircleButtonView(emoji: category.emoji, label: category.name, destination: AnyView(CategoryPage(categoryId: category.id, taskViewModel: taskViewModel)))
                     }
                     CircleButtonView(emoji: "➕", label: "Add", destination: AnyView(AddCategoryView(categoryViewModel: categoryViewModel)))
                 }

@@ -8,19 +8,27 @@ extension Color {
 }
 
 struct CategoryPage: View {
-    var category: Category
+    var categoryId: String
     @ObservedObject var taskViewModel: TaskViewModel
     
     var body: some View {
         ZStack {
             Color.backgroundGray.edgesIgnoringSafeArea(.all)
-            CategoryContentView(category: category, taskViewModel: taskViewModel)
-                .onReceive(taskViewModel.tasksUpdated) { // Listen for updates
-                    taskViewModel.fetchTasksIfNeeded(for: category)
-                }
+            if let category = taskViewModel.currentCategory {
+                CategoryContentView(category: category, taskViewModel: taskViewModel)
+            } else {
+                Text("Loading")
+            }
         }
         .onAppear {
-            taskViewModel.fetchTasksIfNeeded(for: category)
+            taskViewModel.fetchCategory(withId: categoryId)
+        }
+        .onReceive(taskViewModel.$currentCategory) { currentCategory in
+            if let category = currentCategory {
+                Task {
+                    await taskViewModel.fetchTasks(withIds: category.tasks)
+                }
+            }
         }
     }
 }
@@ -32,11 +40,7 @@ struct CategoryContentView: View {
     var body: some View {
         VStack {
             GoalProgressView(
-                category: category,
-                taskViewModel: taskViewModel,
-                title: category.name,
-                progress: Float(category.completedTime / category.targetTime),
-                goalText: "Goal: \(Int(category.targetTime))h"
+                taskViewModel: taskViewModel
             )
             ProgressGridView(taskViewModel: taskViewModel)
             Spacer()
@@ -47,100 +51,100 @@ struct CategoryContentView: View {
 
 
 struct GoalProgressView: View {
-    var category: Category
     @ObservedObject var taskViewModel: TaskViewModel
-    var title: String
-    var progress: Float
-    var goalText: String
     @State private var navigateToAddTask = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("💻") // Laptop emoji
-                    .font(.system(size: 33))
-                    .padding(6)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .shadow(radius: 1)
-                
-                Text(title)
-                    .font(.system(size: UIFont.preferredFont(forTextStyle: .headline).pointSize * 1.5)) // 1.1 times the current size
-                                    .foregroundColor(.black)
-                                
-                                Spacer()
-                
-                Image("check-circle--check") // Your custom checkmark image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                
-                // Percentage display added here, on the right side
-                Text("\(Int(progress * 100))%") // Converts the progress to a percentage
-                    .font(.system(size: 30 * 1.05, weight: .bold)) // 20% larger and bold font
-                    .foregroundColor(Color.blue) // Use the color of the progress bar
-            }
-            
-            ZStack {
-                GeometryReader { geometry in
-                    RoundedRectangle(cornerRadius: 45)
-                        .frame(height: 10)
-                        .foregroundColor(Color.progressGray)
-                    RoundedRectangle(cornerRadius: 45)
-                        .frame(width: geometry.size.width * CGFloat(progress), height: 10)
+            if let category = taskViewModel.currentCategory {
+                HStack {
+                    Text("💻") // Laptop emoji
+                        .font(.system(size: 33))
+                        .padding(6)
+                        .background(Color.white)
+                        .clipShape(Circle())
+                        .shadow(radius: 1)
+                    
+                    Text(category.name)
+                        .font(.system(size: UIFont.preferredFont(forTextStyle: .headline).pointSize * 1.5))
+                        .foregroundColor(.black)
+                    
+                    Spacer()
+                    
+                    Image("check-circle--check") // Your custom checkmark image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                    
+                    Text("\(Int((category.completedTime / category.targetTime) * 100))%")
+                        .font(.system(size: 30 * 1.05, weight: .bold))
                         .foregroundColor(Color.blue)
-                        .animation(.easeInOut, value: progress)
                 }
-            }
-            .frame(height: 10)
-            
-            Rectangle()
-                .fill(Color.clear)
-                .frame(height: 1)
-                .overlay(
-                    Rectangle()
-                        .stroke(style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
-                        .foregroundColor(Color("mygray")) // Custom color from asset catalog
-                )
-                .padding(.vertical)
-            
-            HStack {
-                Image(systemName: "books.vertical")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(Color.textGray)
                 
-                Text(goalText)
-                    .font(.footnote)
-                    .foregroundColor(Color.textGray)
-                
-                Spacer()
-                
-                Button(action: {
-                    navigateToAddTask = true
-                }) {
-                    Text("Add Task")
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
-                }
-                .shadow(radius: 1)
-                .background(
-                    NavigationLink(
-                        destination: AddTaskView(categoryId: category.id, taskViewModel: taskViewModel, onDismiss: {
-                            Task {
-                                await taskViewModel.fetchTasks(withIds: category.tasks)
-                            }
-                        }),
-                        isActive: $navigateToAddTask
-                    ) {
-                        Text("Add Task")
+                ZStack {
+                    GeometryReader { geometry in
+                        RoundedRectangle(cornerRadius: 45)
+                            .frame(height: 10)
+                            .foregroundColor(Color.progressGray)
+                        RoundedRectangle(cornerRadius: 45)
+                            .frame(width: geometry.size.width * CGFloat(category.completedTime / category.targetTime), height: 10)
+                            .foregroundColor(Color.blue)
+                            .animation(.easeInOut, value: category.completedTime / category.targetTime)
                     }
-                        .hidden()
-                )
+                }
+                .frame(height: 10)
+                
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: 1)
+                    .overlay(
+                        Rectangle()
+                            .stroke(style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
+                            .foregroundColor(Color("mygray"))
+                    )
+                    .padding(.vertical)
+                
+                HStack {
+                    Image(systemName: "books.vertical")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(Color.textGray)
+                    
+                    Text("Goal: \(Int(category.targetTime))h")
+                        .font(.footnote)
+                        .foregroundColor(Color.textGray)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        navigateToAddTask = true
+                    }) {
+                        Text("Add Task")
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .clipShape(Capsule())
+                    }
+                    .shadow(radius: 1)
+                    .background(
+                        NavigationLink(
+                            destination: AddTaskView(categoryId: category.id, taskViewModel: taskViewModel, onDismiss: {
+                                Task {
+                                    await taskViewModel.fetchTasks(withIds: category.tasks)
+                                }
+                            }),
+                            isActive: $navigateToAddTask
+                        ) {
+                            Text("Add Task")
+                        }
+                            .hidden()
+                    )
+                }
+            } else {
+                // Placeholder or loading indicator
+                Text("Loading category data...")
             }
         }
         .padding()
@@ -150,6 +154,7 @@ struct GoalProgressView: View {
         .scaleEffect(0.8)
     }
 }
+
 
 struct ProgressGridView: View {
     @ObservedObject var taskViewModel: TaskViewModel
@@ -248,7 +253,6 @@ struct ProgressCell: View {
 
 struct Bside_Previews: PreviewProvider {
     static var previews: some View {
-        let mockCategory = Category(id: "1", emoji: "S", name: "Sample Category", targetTime: 10000, completedTime: 3000, tasks: [])
-        CategoryPage(category: mockCategory, taskViewModel: TaskViewModel())
+        CategoryPage(categoryId: "A156C7F3-32B8-4F25-9982-A723AA512FFA", taskViewModel: TaskViewModel())
     }
 }
