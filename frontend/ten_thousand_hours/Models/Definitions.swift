@@ -34,3 +34,13 @@ struct TaskItem: Identifiable {
 class UserSession: ObservableObject {
     @Published var currentUser: User?
 }
+
+extension TaskCard {
+    init(taskItem: TaskItem) {
+        self.title = taskItem.name
+        self.iconName = "💡"
+        self.progress = Float(taskItem.completedTime / taskItem.targetTime)
+        self.goalText = "Goal: \(taskItem.targetTime)h" // Customize as needed
+        self.color = "MyBlue" // Replace with actual color logic
+    }
+}

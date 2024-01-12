@@ -189,3 +189,41 @@ class TaskViewModel: ObservableObject {
         }
     }
 }
+
+class UserAllTasksViewModel: ObservableObject {
+    @Published var allTasks: [TaskItem] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String = ""
+
+    private var categoryViewModel: CategoryViewModel
+    private var taskViewModel: TaskViewModel
+
+    init(categoryViewModel: CategoryViewModel, taskViewModel: TaskViewModel) {
+        self.categoryViewModel = categoryViewModel
+        self.taskViewModel = taskViewModel
+    }
+
+    func fetchAllTasksForCurrentUser() {
+        isLoading = true
+
+        Task {
+            var fetchedTasks: [TaskItem] = []
+
+            // Fetch categories for the current user
+            categoryViewModel.fetchCategoriesForCurrentUser()
+            let categories = categoryViewModel.userCategories
+
+            // Fetch tasks for each category
+            for category in categories {
+                await taskViewModel.fetchTasks(withIds: category.tasks)
+                fetchedTasks.append(contentsOf: taskViewModel.tasks)
+            }
+
+            // Update the UI on the main thread
+            DispatchQueue.main.async {
+                self.allTasks = fetchedTasks
+                self.isLoading = false
+            }
+        }
+    }
+}

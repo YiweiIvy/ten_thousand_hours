@@ -257,17 +257,18 @@ struct CircleButtonView: View {
 // MARK: - Tasks
 // Define the horizontal scroll view
 struct TaskScrollView: View {
+    @ObservedObject var userAllTasksViewModel: UserAllTasksViewModel
     
-    // Two-dimensional array to hold tasks in pairs
     private var taskPairs: [[TaskCard]] {
         var pairs: [[TaskCard]] = []
-        for index in stride(from: 0, to: TaskCard.allTasks.count, by: 2) {
+        let allTasks = userAllTasksViewModel.allTasks.map(TaskCard.init)
+        for index in stride(from: 0, to: allTasks.count, by: 2) {
             var pair: [TaskCard] = []
-            if index < TaskCard.allTasks.count {
-                pair.append(TaskCard.allTasks[index])
+            if index < allTasks.count {
+                pair.append(allTasks[index])
             }
-            if index + 1 < TaskCard.allTasks.count {
-                pair.append(TaskCard.allTasks[index + 1])
+            if index + 1 < allTasks.count {
+                pair.append(allTasks[index + 1])
             }
             pairs.append(pair)
         }
@@ -319,9 +320,13 @@ struct TaskScrollView: View {
 
 // Example usage
 struct TasksView: View {
+    @StateObject var userAllTasksViewModel = UserAllTasksViewModel(categoryViewModel: CategoryViewModel(model: CategoryModel()), taskViewModel: TaskViewModel())
     
     var body: some View {
-        TaskScrollView()
+        TaskScrollView(userAllTasksViewModel: userAllTasksViewModel)
+            .onAppear {
+                userAllTasksViewModel.fetchAllTasksForCurrentUser()
+            }
     }
 }
 
