@@ -24,7 +24,7 @@ struct Category: Identifiable {
     var tasks: [String]
 }
 
-struct TaskItem {
+struct TaskItem: Identifiable, Hashable {
     var id: String
     var name: String
     var targetTime: TimeInterval  // Target time for this goal card
@@ -33,4 +33,14 @@ struct TaskItem {
 
 class UserSession: ObservableObject {
     @Published var currentUser: User?
+}
+
+extension TaskCard {
+    init(taskItem: TaskItem) {
+        self.title = taskItem.name
+        self.iconName = "💡"
+        self.progress = Float(taskItem.completedTime / taskItem.targetTime)
+        self.goalText = "Goal: \(taskItem.targetTime)h" // Customize as needed
+        self.color = "MyBlue" // Replace with actual color logic
+    }
 }

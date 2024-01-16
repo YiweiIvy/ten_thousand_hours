@@ -58,6 +58,8 @@ class CategoryModel {
                 "id": .string(category.id),
                 "emoji": .string(category.emoji),
                 "name": .string(category.name),
+                "targetTime": .double(category.targetTime),
+                "completedTime": .double(category.completedTime),
                 "tasks":[]
             ]
             _ = try await categoriesCollection.insertOne(categoryDocument)

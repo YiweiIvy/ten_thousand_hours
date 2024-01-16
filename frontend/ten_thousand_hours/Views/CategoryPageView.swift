@@ -123,7 +123,7 @@ struct GoalProgressView: View {
                         Text("Add Task")
                             .padding(.horizontal, 20)
                             .padding(.vertical, 10)
-                            .background(Color.blue)
+                            .background(Color("DarkPurple"))
                             .foregroundColor(.white)
                             .clipShape(Capsule())
                     }
@@ -159,19 +159,13 @@ struct GoalProgressView: View {
 struct ProgressGridView: View {
     @ObservedObject var taskViewModel: TaskViewModel
     
+    
     var body: some View {
-        let items = taskViewModel.tasks.map { task in
-            ProgressItem(
-                title: task.name,
-                color: .green, // Dynamic setting can be applied
-                progress: Float(task.completedTime / task.targetTime),
-                icon: "laptopcomputer" // Default icon; modify as needed
-            )
-        }
+        let items = taskViewModel.tasks
         ScrollView(.vertical) { // Wrap in a ScrollView with vertical scrolling
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
-                ForEach(items, id: \.title) { item in
-                    ProgressCell(item: item)
+                ForEach(items) { item in
+                    ProgressCell(item: item, taskViewModel: taskViewModel)
                 }
             }
             .padding()
@@ -179,16 +173,10 @@ struct ProgressGridView: View {
     }
 }
 
-struct ProgressItem {
-    var title: String
-    var color: Color
-    var progress: Float
-    var hours: Int? = nil
-    var icon: String
-}
 
 struct ProgressCell: View {
-    var item: ProgressItem
+    var item: TaskItem
+    @ObservedObject var taskViewModel: TaskViewModel
 
     var body: some View {
         VStack {
@@ -203,46 +191,52 @@ struct ProgressCell: View {
 
                 Spacer()
 
-                Text(item.title) // Text on the right
+                Text(item.name) // Text on the right
                     .font(.headline)
                     .foregroundColor(.black)
             }
-            .padding(.bottom, 5)
-
-            // Dotted line
+            
             Rectangle()
                 .fill(Color.clear)
                 .frame(height: 1)
                 .overlay(
                     Rectangle()
-                        .stroke(style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
-                        .foregroundColor(Color("mygray")) // Custom color from asset catalog
+                        .stroke(style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [3]))
+                        .foregroundColor(Color("mygray"))
                 )
-
+                .padding(.vertical, 5)
+            
             // Progress ring with percentage in the middle
             ZStack {
                 Circle()
-                    .stroke(Color.progressGray, lineWidth: 6)
+                    .stroke(Color("mygray"), lineWidth: 10)
                     .frame(width: 70, height: 70)
 
                 Circle()
-                    .trim(from: 0.0, to: CGFloat(min(self.item.progress, 1.0)))
-                    .stroke(item.color, lineWidth: 6)
+                    .trim(from: 0.0, to: CGFloat(min(item.completedTime / item.targetTime, 1.0)))
+                    .stroke(Color("MyBlue"), style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .frame(width: 70, height: 70)
                     .rotationEffect(Angle(degrees: 270.0))
 
-                Text("\(Int(item.progress * 100))%") // Percentage
-                    .font(.caption)
+                Text("\(Int(item.completedTime / item.targetTime * 100))%") // Percentage
+                    .font(.system(size: 16).bold())
                     .foregroundColor(.black)
             }
-            .padding(.top, 5)
+            .padding(.vertical, 5)
 
-            // Hours (if available)
-            if let hours = item.hours {
-                Text("\(hours)h")
-                    .font(.caption)
-                    .foregroundColor(Color.textGray)
+            Text(String(format: "%.2f / %.2f h", item.completedTime, item.targetTime))
+                .font(.caption)
+                .foregroundColor(Color.textGray)
+            
+            NavigationLink(destination: TimerPageView(task: item, taskViewModel: taskViewModel)) {
+                Text("Timer")
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color("DarkPurple"))
+                    .foregroundColor(.white)
+                    .clipShape(Capsule())
             }
+            .padding(.top, 10)
         }
         .padding()
         .background(Color.white)
@@ -253,6 +247,6 @@ struct ProgressCell: View {
 
 struct Bside_Previews: PreviewProvider {
     static var previews: some View {
-        CategoryPage(categoryId: "A156C7F3-32B8-4F25-9982-A723AA512FFA", taskViewModel: TaskViewModel())
+        CategoryPage(categoryId: "66C52CF5-C179-4AF1-A5EE-7984E65175B2", taskViewModel: TaskViewModel())
     }
 }

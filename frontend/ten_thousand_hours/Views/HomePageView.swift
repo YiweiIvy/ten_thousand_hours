@@ -257,17 +257,18 @@ struct CircleButtonView: View {
 // MARK: - Tasks
 // Define the horizontal scroll view
 struct TaskScrollView: View {
+    @ObservedObject var userAllTasksViewModel: UserAllTasksViewModel
     
-    // Two-dimensional array to hold tasks in pairs
-    private var taskPairs: [[TaskCard]] {
-        var pairs: [[TaskCard]] = []
-        for index in stride(from: 0, to: TaskCard.allTasks.count, by: 2) {
-            var pair: [TaskCard] = []
-            if index < TaskCard.allTasks.count {
-                pair.append(TaskCard.allTasks[index])
+    private var taskPairs: [[TaskItem]] {
+        var pairs: [[TaskItem]] = []
+        let allTasks = userAllTasksViewModel.allTasks
+        for index in stride(from: 0, to: allTasks.count, by: 2) {
+            var pair: [TaskItem] = []
+            if index < allTasks.count {
+                pair.append(allTasks[index])
             }
-            if index + 1 < TaskCard.allTasks.count {
-                pair.append(TaskCard.allTasks[index + 1])
+            if index + 1 < allTasks.count {
+                pair.append(allTasks[index + 1])
             }
             pairs.append(pair)
         }
@@ -305,8 +306,8 @@ struct TaskScrollView: View {
                     ForEach(taskPairs, id: \.self) { pair in // Loop through task pairs
                         VStack {
                             ForEach(pair, id: \.id) { task in
-                                ProgressView(task: task)
-                                    .frame(width: 300, height: 180) // Set a larger frame for each card
+                                ProgressView(item: task)
+                                    .frame(width: 300, height: 180)
                             }
                         }
                     }
@@ -319,26 +320,31 @@ struct TaskScrollView: View {
 
 // Example usage
 struct TasksView: View {
+    @StateObject var userAllTasksViewModel = UserAllTasksViewModel(categoryViewModel: CategoryViewModel(model: CategoryModel()), taskViewModel: TaskViewModel())
     
     var body: some View {
-        TaskScrollView()
+        TaskScrollView(userAllTasksViewModel: userAllTasksViewModel)
+            .onAppear {
+                userAllTasksViewModel.fetchAllTasksForCurrentUser()
+            }
     }
 }
 
 struct ProgressView: View {
-    let task: TaskCard // Your Task model
+    let item: TaskItem // Your Task model
+    @State private var goToTimer = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(task.iconName) // Replace with your icon name
+                Text("📚")
                     .font(.system(size: 33))
                     .padding(6)
                     .background(Color.white)
                     .clipShape(Circle())
                     .shadow(radius: 1)
                 
-                Text(task.title)
+                Text(item.name)
                     .font(.headline)
                     .foregroundColor(.black)
                 
@@ -346,9 +352,9 @@ struct ProgressView: View {
                 
                 ZStack {
                     RoundedRectangle(cornerRadius: 20)
-                        .foregroundColor(Color(task.color))
-                        .frame(minWidth: 42, minHeight: 21) // Minimum size to accommodate the text and padding
-                    Text("\(Int(task.progress * 100))%")
+                        .foregroundColor(Color(.myBlue))
+                        .frame(minWidth: 42, minHeight: 21)
+                    Text("\(Int((item.completedTime / item.targetTime) * 100))%")
                         .font(.caption)
                         .foregroundColor(.white)
                         .padding(.horizontal, 8)
@@ -362,9 +368,9 @@ struct ProgressView: View {
                         .frame(height: 10)
                         .foregroundColor(Color.gray.opacity(0.2))
                     RoundedRectangle(cornerRadius: 45)
-                        .frame(width: geometry.size.width * CGFloat(task.progress), height: 10)
-                        .foregroundColor(Color(task.color))
-                        .animation(.easeInOut, value: task.progress)
+                        .frame(width: geometry.size.width * CGFloat(item.completedTime / item.targetTime), height: 10)
+                        .foregroundColor(Color(.blue))
+                        .animation(.easeInOut, value: item.completedTime / item.targetTime)
                 }
             }
             .frame(height: 10)
@@ -373,14 +379,20 @@ struct ProgressView: View {
                 .background(Color.gray.opacity(0.5)) // Custom color from asset catalog
                 
             HStack {
-                Text(task.goalText)
+                Text("Goal: \(item.targetTime)h")
                     .font(.footnote)
                     .foregroundColor(Color.gray)
                 
                 Spacer()
                 
+                // Hidden NavigationLink
+                NavigationLink(destination: TimerPageView(task: item, taskViewModel: TaskViewModel()), isActive: $goToTimer) {
+                    EmptyView() // Empty view as we don't want to show the NavigationLink
+                }
+                
+                // Your button
                 Button(action: {
-                    // Actions to continue
+                    self.goToTimer = true // Activate the navigation link when button is pressed
                 }) {
                     Text("Continue")
                         .padding(.horizontal, 20)
@@ -417,15 +429,6 @@ struct TaskCard: Identifiable, Hashable { // Conform to Hashable
     static func == (lhs: TaskCard, rhs: TaskCard) -> Bool {
         lhs.id == rhs.id
     }
-    
-    // Sample data
-    static let allTasks = [
-        TaskCard(title: "Web Design", iconName: "🎨", progress: 0.44, goalText: "Goal: 100h", color:"MyOrange"),
-        TaskCard(title: "Python", iconName: "💻", progress: 0.80, goalText: "Goal: 50h", color:"MyBlue"),
-        TaskCard(title: "Python", iconName: "💻", progress: 0.25, goalText: "Goal: 50h", color:"MyBlue"),
-        TaskCard(title: "Python", iconName: "🎨", progress: 0.50, goalText: "Goal: 50h", color:"MyGreen"),
-        // Add more tasks here...
-    ]
 }
 
 // MARK: - BottomNavigationBar

@@ -10,9 +10,11 @@ import SwiftUI
 
 import SwiftUI
 
-struct TimerApp: View {
+struct TimerPageView: View {
     @State private var timeElapsed = 0 // Starts at 0 seconds
     @State private var timerRunning = false
+    var task: TaskItem
+    @ObservedObject var taskViewModel: TaskViewModel
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -24,7 +26,7 @@ struct TimerApp: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 24, height: 24)
-                Text("Task Name")
+                Text(task.name)
                     .font(.headline)
             }
             .padding(.horizontal, 20)
@@ -46,6 +48,7 @@ struct TimerApp: View {
                 .onReceive(timer) { _ in
                     if self.timerRunning {
                         self.timeElapsed += 1
+                        print(self.timeElapsed)
                     }
                 }
             
@@ -82,7 +85,7 @@ struct TimerApp: View {
         }
         .padding()
     }
-
+    
     func startTimer() {
         timerRunning = true
     }
@@ -90,12 +93,26 @@ struct TimerApp: View {
     func pauseTimer() {
         timerRunning = false
     }
-
+    
     func resetTimer() {
-        timerRunning = false
-        timeElapsed = 0
-    }
+        // Call update functions before resetting timeElapsed
+        pauseTimer()
+        Task {
+            print("before update:\(self.timeElapsed)")
+            let timeToUpdate = self.timeElapsed
+            let timeToUpdateInHours = Double(timeToUpdate) / 3600.0 // Convert to Double
+            print("before update:\(timeToUpdateInHours)")
+            await taskViewModel.updateCompletedTimeForTask(taskId: self.task.id, additionalTime: TimeInterval(timeToUpdateInHours))
+            await taskViewModel.updateCompletedTimeForCategory(additionalTime: TimeInterval(timeToUpdateInHours))
 
+            // Reset timeElapsed after the above await functions are completed
+            DispatchQueue.main.async {
+                self.timeElapsed = 0
+                print("after update:\(self.timeElapsed)")
+            }
+        }
+    }
+    
     func formatTime(_ totalSeconds: Int) -> String {
         let hours = totalSeconds / 3600
         let minutes = (totalSeconds % 3600) / 60
@@ -104,10 +121,3 @@ struct TimerApp: View {
         return (hours > 0 ? String(format: "%02d:", hours) : "") + String(format: "%02d:%02d", minutes, seconds)
     }
 }
-
-struct TimerApp_Previews: PreviewProvider {
-    static var previews: some View {
-        TimerApp()
-    }
-}
-
